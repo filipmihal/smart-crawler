@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCrawler", "SmartCrawler\SmartCrawler.csproj", "{617F0C49-CE43-46E9-8429-C61B191B46FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCrawlerExample", "SmartCrawlerExample\SmartCrawlerExample.csproj", "{01139B69-D1B4-483E-87DD-40C47E545E07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCrawlerExample", "SmartCrawlerExample\SmartCrawlerExample.csproj", "{291DD8BE-A4CC-4EAF-AFC2-02C217AEE6B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +14,9 @@ Global
 		{617F0C49-CE43-46E9-8429-C61B191B46FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{617F0C49-CE43-46E9-8429-C61B191B46FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{617F0C49-CE43-46E9-8429-C61B191B46FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{01139B69-D1B4-483E-87DD-40C47E545E07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{01139B69-D1B4-483E-87DD-40C47E545E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{01139B69-D1B4-483E-87DD-40C47E545E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{01139B69-D1B4-483E-87DD-40C47E545E07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{291DD8BE-A4CC-4EAF-AFC2-02C217AEE6B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{291DD8BE-A4CC-4EAF-AFC2-02C217AEE6B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{291DD8BE-A4CC-4EAF-AFC2-02C217AEE6B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{291DD8BE-A4CC-4EAF-AFC2-02C217AEE6B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
