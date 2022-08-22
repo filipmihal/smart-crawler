@@ -2,9 +2,9 @@
 
 public class HtmlScraper
 {
-    private readonly HttpClient _client = new HttpClient();
+    private static readonly HttpClient _client = new HttpClient();
 
-    public async Task<ScraperResponse> ScrapeUrl(string url)
+    public static async Task<ScraperResponse> ScrapeUrl(string url)
     {
         try
         {

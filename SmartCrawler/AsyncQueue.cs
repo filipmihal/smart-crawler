@@ -4,7 +4,6 @@ public class AsyncQueue<T>
 {
     private readonly Queue<T> _queue = new Queue<T>();
     private readonly int _size;
-    public bool Finished = false;
 
     public AsyncQueue(int size)
     {
@@ -33,7 +32,6 @@ public class AsyncQueue<T>
     {
         lock (_queue)
         {
-            Finished = true;
             Monitor.PulseAll(_queue);
         }
     }
@@ -45,10 +43,6 @@ public class AsyncQueue<T>
 
             while (_queue.Count <= 0)
             {
-                if (Finished)
-                {
-                    throw new EndedQueueException();
-                }
                 Monitor.Wait(_queue);
             }
 
