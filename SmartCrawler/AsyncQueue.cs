@@ -2,23 +2,22 @@ namespace SmartCrawler;
 
 public class AsyncQueue<T>
 {
-    private readonly Queue<T> _queue = new Queue<T>();
-    private readonly int _size;
+    private readonly Queue<T> _queue;
 
-    public AsyncQueue(int size)
+    public AsyncQueue()
     {
-        _size = size;
+        _queue = new Queue<T>();
+    }
+
+    public AsyncQueue(T[] initialArray)
+    {
+        _queue = new Queue<T>(initialArray);
     }
 
     public void Enqueue(T elem)
     {
         lock (_queue)
         {
-            if (_queue.Count >= _size)
-            {
-                Monitor.Wait(_queue);
-            }
-            
             _queue.Enqueue(elem);
             
             if (_queue.Count == 1)
@@ -40,18 +39,7 @@ public class AsyncQueue<T>
     {
         lock (_queue)
         {
-
-            while (_queue.Count <= 0)
-            {
-                Monitor.Wait(_queue);
-            }
-
             T elem = _queue.Dequeue();
-            
-            if (_queue.Count == _size - 1)
-            {
-                Monitor.Pulse(_queue);
-            }
             return elem;
         }
         
