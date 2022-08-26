@@ -6,7 +6,7 @@ public struct CrawledSite
     public readonly int Retries = 0;
     public readonly int DepthsLeft;
 
-    public CrawledSite(string url, int retries, int depthsLeft)
+    public CrawledSite(string url, int depthsLeft, int retries = 0)
     {
         Url = url;
         Retries = retries;
