@@ -1,6 +1,6 @@
 namespace Tests;
 
-public class Tests
+public class LinkParserTest
 {
     [SetUp]
     public void Setup()

@@ -56,6 +56,26 @@ public class SmartCrawler
         }
     }
 
+    public static List<CrawledSite> FilterAndFormatUrls(List<string> rawUrls, int newDepth, bool crossDomain, string parentUrl)
+    {
+        List<CrawledSite> sitesToCrawl = new List<CrawledSite>();
+        Uri parentUri = new Uri(parentUrl);
+        foreach (var url in rawUrls)
+        {
+            if (!crossDomain)
+            {
+                Uri childUri = new Uri(url);
+                if (childUri.Host != parentUri.Host)
+                {
+                    continue;
+                }
+            }
+            sitesToCrawl.Add(new CrawledSite(url, newDepth));
+        }
+
+        return sitesToCrawl;
+    }
+
     public static List<string> ParseLinks(string inputString, string parentUrl)
     {
         List<string> links = new List<string>();
