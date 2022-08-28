@@ -74,7 +74,14 @@ public class SmartCrawler
             }
             else
             {
-                links.Add($"{parentUrl}/{link}");
+                if (uri.AbsolutePath.EndsWith("/"))
+                {
+                    links.Add($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}{link}");
+                }
+                else
+                {
+                    links.Add($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{link}");
+                }
             }
         }
 
