@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace SmartCrawler;
 
 public class SmartCrawler
@@ -53,6 +55,33 @@ public class SmartCrawler
             }
         }
     }
+
+    public static List<string> ParseLinks(string inputString, string parentUrl)
+    {
+        List<string> links = new List<string>();
+        Uri uri = new Uri(parentUrl);
+        foreach (Match match in Regex.Matches(inputString, "<a\\s+(?:[^>]*?\\s+)?href=([\"\'])(.*?)[\"\']"))
+        {
+            string link = match.Groups[2].ToString();
+
+            if (link.StartsWith("http"))
+            {
+                links.Add(link);
+            }
+            else if (link.StartsWith("/"))
+            {
+                links.Add($"{uri.Scheme}://{uri.Host}{link}");
+            }
+            else
+            {
+                links.Add($"{parentUrl}/{link}");
+            }
+        }
+
+        return links;
+    }
+
+
 
     public async Task StartAsync()
     {
