@@ -2,15 +2,15 @@ namespace SmartCrawler;
 
 public class SmartCrawler
 {
-    private readonly int _threads;
+    private readonly int _numberOfConcurrentCrawlers;
     private readonly int _linkDepth;
     private readonly CrawledSite[] _initialUrlList;
     private readonly AsyncStorage<CrawledSite> _storage = new AsyncStorage<CrawledSite>();
 
 
-    public SmartCrawler(int threads, int linkDepth, string[] initialUrlArray)
+    public SmartCrawler(int numberOfThreads, int linkDepth, string[] initialUrlArray)
     {
-        _threads = threads;
+        _numberOfConcurrentCrawlers = numberOfThreads;
         _linkDepth = linkDepth;
         _initialUrlList = ConvertUrlArrayToList(initialUrlArray);
     }
@@ -26,7 +26,7 @@ public class SmartCrawler
 
         return list;
     }
-    private async void Crawl(AsyncQueue<CrawledSite> queue, AsyncStorage<CrawledSite> storage, ThreadState threadState, int threadId)
+    private async Task Crawl(AsyncQueue<CrawledSite> queue, AsyncStorage<CrawledSite> storage, ThreadState threadState, int threadId)
     {
         while (true)
         {
@@ -36,7 +36,7 @@ public class SmartCrawler
                 siteToCrawl = queue.Dequeue();
                 threadState.UpdateState(threadId, false);
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 if (threadState.UpdateAndCanFinish(threadId, true))
                 {
@@ -54,15 +54,20 @@ public class SmartCrawler
         }
     }
 
-    public void Start(int numberOfThreads)
+    public async Task StartAsync()
     {
         AsyncQueue<CrawledSite> queue = new AsyncQueue<CrawledSite>(_initialUrlList);
-        ThreadState threadState = new ThreadState(numberOfThreads);
-        for (int threadId = 0; threadId < numberOfThreads; threadId++)
+        ThreadState threadState = new ThreadState(_numberOfConcurrentCrawlers);
+
+        List<Task> tasks = new List<Task>();
+
+        for (var i = 0; i < _numberOfConcurrentCrawlers; i++)
         {
-            var crawlingThread = new Thread(() => Crawl(queue, _storage, threadState, threadId));
-            crawlingThread.Start();   
+            int threadId = i;
+            tasks.Add(Task.Run(async () => await Crawl(queue, _storage, threadState, threadId)));
         }
+
+        await Task.WhenAll(tasks);
     }
 
     public List<CrawledSite> GetFinalList()
