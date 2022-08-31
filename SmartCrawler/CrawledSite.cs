@@ -1,6 +1,6 @@
 namespace SmartCrawler;
 
-public struct CrawledSite
+public readonly struct CrawledSite : IAsyncQueueItem
 {
     public readonly string Url;
     public readonly int Retries = 0;
@@ -11,5 +11,10 @@ public struct CrawledSite
         Url = url;
         Retries = retries;
         DepthsLeft = depthsLeft;
+    }
+
+    public string GetKey()
+    {
+        return Url;
     }
 }

@@ -14,28 +14,28 @@ public class SmartCrawler
     {
         _numberOfConcurrentCrawlers = numberOfThreads;
         _linkDepth = linkDepth;
-        _initialUrlList = ConvertUrlArrayToList(initialUrlArray);
+        _initialUrlList = ConvertInitialUrlArrayToList(initialUrlArray);
     }
 
-    private static CrawledSite[] ConvertUrlArrayToList(string[] urls)
+    private CrawledSite[] ConvertInitialUrlArrayToList(string[] urls)
     {
         CrawledSite[] list = new CrawledSite[urls.Length];
         for (int urlIndex = 0; urlIndex < urls.Length; urlIndex++)
         {
             // todo depths left
-            list[urlIndex] = new CrawledSite(urls[urlIndex], 0);
+            list[urlIndex] = new CrawledSite(urls[urlIndex], _linkDepth);
         }
 
         return list;
     }
-    private async Task Crawl(AsyncQueue<CrawledSite> queue, AsyncStorage<CrawledSite> storage, ThreadState threadState, int threadId)
+    private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<CrawledSite> storage, ThreadState threadState, int threadId)
     {
         while (true)
         {
             CrawledSite siteToCrawl;
             try
             {
-                siteToCrawl = queue.Dequeue();
+                siteToCrawl = uniqueQueue.Dequeue();
                 threadState.UpdateState(threadId, false);
             }
             catch (InvalidOperationException)
@@ -47,6 +47,14 @@ public class SmartCrawler
                 continue;
             }
             ScraperResponse response = await HtmlScraper.ScrapeUrl(siteToCrawl.Url);
+            if (siteToCrawl.DepthsLeft > 0)
+            {
+                List<string> links = ParseLinks(response.Html, siteToCrawl.Url);
+                List<CrawledSite> sites = FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1, false, siteToCrawl.Url);
+                uniqueQueue.EnqueueList(sites);
+
+            }
+            // TODO: create an options object
             // TODO: check retries
             // TODO: add links to the queue
             if (response.IsSuccessful)
@@ -112,7 +120,7 @@ public class SmartCrawler
 
     public async Task StartAsync()
     {
-        AsyncQueue<CrawledSite> queue = new AsyncQueue<CrawledSite>(_initialUrlList);
+        AsyncUniqueQueue<CrawledSite> uniqueQueue = new AsyncUniqueQueue<CrawledSite>(_initialUrlList);
         ThreadState threadState = new ThreadState(_numberOfConcurrentCrawlers);
 
         List<Task> tasks = new List<Task>();
@@ -120,7 +128,7 @@ public class SmartCrawler
         for (var i = 0; i < _numberOfConcurrentCrawlers; i++)
         {
             int threadId = i;
-            tasks.Add(Task.Run(async () => await Crawl(queue, _storage, threadState, threadId)));
+            tasks.Add(Task.Run(async () => await Crawl(uniqueQueue, _storage, threadState, threadId)));
         }
 
         await Task.WhenAll(tasks);
