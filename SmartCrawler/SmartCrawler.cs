@@ -10,9 +10,9 @@ public class SmartCrawler
     private readonly AsyncStorage<CrawledSite> _storage = new AsyncStorage<CrawledSite>();
 
 
-    public SmartCrawler(int numberOfThreads, int linkDepth, string[] initialUrlArray)
+    public SmartCrawler(int numberOfCrawlers, int linkDepth, string[] initialUrlArray)
     {
-        _numberOfConcurrentCrawlers = numberOfThreads;
+        _numberOfConcurrentCrawlers = numberOfCrawlers;
         _linkDepth = linkDepth;
         _initialUrlList = ConvertInitialUrlArrayToList(initialUrlArray);
     }
@@ -73,7 +73,8 @@ public class SmartCrawler
             if (!crossDomain)
             {
                 Uri childUri = new Uri(url);
-                if (childUri.Host != parentUri.Host)
+                
+                if (childUri.CleanHost() != parentUri.CleanHost())
                 {
                     continue;
                 }

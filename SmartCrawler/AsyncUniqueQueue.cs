@@ -8,7 +8,7 @@ public interface IAsyncQueueItem
 public class AsyncUniqueQueue<T> where T : IAsyncQueueItem
 
 {
-    private readonly Queue<T> _queue;
+    private readonly Queue<T> _queue = new Queue<T>();
     private readonly HashSet<string> _set = new HashSet<string>();
 
     public AsyncUniqueQueue()
@@ -18,7 +18,7 @@ public class AsyncUniqueQueue<T> where T : IAsyncQueueItem
 
     public AsyncUniqueQueue(T[] initialArray)
     {
-        _queue = new Queue<T>(initialArray);
+        EnqueueList(initialArray);
     }
 
     public void Enqueue(T elem)
@@ -48,9 +48,9 @@ public class AsyncUniqueQueue<T> where T : IAsyncQueueItem
             {
                 if (_set.Contains(elem.GetKey()))
                 {
-                    return;
+                    continue;
                 }
-
+                
                 _set.Add(elem.GetKey());
                 _queue.Enqueue(elem);
 
