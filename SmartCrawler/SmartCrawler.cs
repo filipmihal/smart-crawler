@@ -4,16 +4,14 @@ namespace SmartCrawler;
 
 public class SmartCrawler
 {
-    private readonly int _numberOfConcurrentCrawlers;
-    private readonly int _linkDepth;
+    private readonly CrawlerOptions _options;
     private readonly CrawledSite[] _initialUrlList;
     private readonly AsyncStorage<CrawledSite> _storage = new AsyncStorage<CrawledSite>();
 
 
-    public SmartCrawler(int numberOfCrawlers, int linkDepth, string[] initialUrlArray)
+    public SmartCrawler(CrawlerOptions options, string[] initialUrlArray)
     {
-        _numberOfConcurrentCrawlers = numberOfCrawlers;
-        _linkDepth = linkDepth;
+        _options = options;
         _initialUrlList = ConvertInitialUrlArrayToList(initialUrlArray);
     }
 
@@ -22,8 +20,8 @@ public class SmartCrawler
         CrawledSite[] list = new CrawledSite[urls.Length];
         for (int urlIndex = 0; urlIndex < urls.Length; urlIndex++)
         {
-            // todo depths left
-            list[urlIndex] = new CrawledSite(urls[urlIndex], _linkDepth);
+            int crawlingDepth = _options.DepthOptions?.CrawlingDepth ?? 0;
+            list[urlIndex] = new CrawledSite(urls[urlIndex], crawlingDepth, _options.MaxRetries);
         }
 
         return list;
@@ -47,20 +45,28 @@ public class SmartCrawler
                 continue;
             }
             ScraperResponse response = await HtmlScraper.ScrapeUrl(siteToCrawl.Url);
-            if (siteToCrawl.DepthsLeft > 0)
+            if (!response.IsSuccessful)
+            {
+                if (!response.IsCritical)
+                {
+                    if (siteToCrawl.Retries > 0)
+                    {
+                        siteToCrawl.Retries -= 1;
+                        uniqueQueue.Enqueue(siteToCrawl);
+                    }
+                }
+
+                continue;
+
+            }
+            if (siteToCrawl.DepthsLeft > 0 && _options.DepthOptions.HasValue)
             {
                 List<string> links = ParseLinks(response.Html, siteToCrawl.Url);
-                List<CrawledSite> sites = FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1, false, siteToCrawl.Url);
+                List<CrawledSite> sites = FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1, _options.DepthOptions.Value.VisitCrossDomain, siteToCrawl.Url);
                 uniqueQueue.EnqueueList(sites);
 
             }
-            // TODO: create an options object
-            // TODO: check retries
-            // TODO: add links to the queue
-            if (response.IsSuccessful)
-            {
-                storage.Add(siteToCrawl);
-            }
+            storage.Add(siteToCrawl);
         }
     }
 
@@ -73,7 +79,7 @@ public class SmartCrawler
             if (!crossDomain)
             {
                 Uri childUri = new Uri(url);
-                
+
                 if (childUri.CleanHost() != parentUri.CleanHost())
                 {
                     continue;
@@ -122,11 +128,11 @@ public class SmartCrawler
     public async Task StartAsync()
     {
         AsyncUniqueQueue<CrawledSite> uniqueQueue = new AsyncUniqueQueue<CrawledSite>(_initialUrlList);
-        ThreadState threadState = new ThreadState(_numberOfConcurrentCrawlers);
+        ThreadState threadState = new ThreadState(_options.ParallelCrawlers);
 
         List<Task> tasks = new List<Task>();
 
-        for (var i = 0; i < _numberOfConcurrentCrawlers; i++)
+        for (var i = 0; i < _options.ParallelCrawlers; i++)
         {
             int threadId = i;
             tasks.Add(Task.Run(async () => await Crawl(uniqueQueue, _storage, threadState, threadId)));

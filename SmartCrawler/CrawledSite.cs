@@ -1,9 +1,9 @@
 namespace SmartCrawler;
 
-public readonly struct CrawledSite : IAsyncQueueItem
+public struct CrawledSite : IAsyncQueueItem
 {
     public readonly string Url;
-    public readonly int Retries = 0;
+    public int Retries = 0;
     public readonly int DepthsLeft;
 
     public CrawledSite(string url, int depthsLeft, int retries = 0)
