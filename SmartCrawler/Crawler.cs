@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using SmartCrawler.Modules;
 
 namespace SmartCrawler;
 
@@ -6,7 +6,7 @@ public class SmartCrawler
 {
     private readonly CrawlerOptions _options;
     private readonly CrawledSite[] _initialUrlList;
-    private readonly AsyncStorage<CrawledSite> _storage = new AsyncStorage<CrawledSite>();
+    private readonly AsyncStorage<dynamic> _storage = new AsyncStorage<dynamic>();
 
 
     public SmartCrawler(CrawlerOptions options, string[] initialUrlArray)
@@ -26,7 +26,7 @@ public class SmartCrawler
 
         return list;
     }
-    private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<CrawledSite> storage, ThreadState threadState, int threadId)
+    private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<dynamic> storage, ThreadState threadState, int threadId)
     {
         while (true)
         {
@@ -61,69 +61,14 @@ public class SmartCrawler
             }
             if (siteToCrawl.DepthsLeft > 0 && _options.DepthOptions.HasValue)
             {
-                List<string> links = ParseLinks(response.Html, siteToCrawl.Url);
-                List<CrawledSite> sites = FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1, _options.DepthOptions.Value.VisitCrossDomain, siteToCrawl.Url);
+                List<string> links = CrawlerHelpers.ParseLinks(response.Html, siteToCrawl.Url);
+                List<CrawledSite> sites = CrawlerHelpers.FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1, _options.DepthOptions.Value.VisitCrossDomain, siteToCrawl.Url);
                 uniqueQueue.EnqueueList(sites);
 
             }
             storage.Add(siteToCrawl);
         }
     }
-
-    public static List<CrawledSite> FilterAndFormatUrls(List<string> rawUrls, int newDepth, bool crossDomain, string parentUrl)
-    {
-        List<CrawledSite> sitesToCrawl = new List<CrawledSite>();
-        Uri parentUri = new Uri(parentUrl);
-        foreach (var url in rawUrls)
-        {
-            if (!crossDomain)
-            {
-                Uri childUri = new Uri(url);
-
-                if (childUri.CleanHost() != parentUri.CleanHost())
-                {
-                    continue;
-                }
-            }
-            sitesToCrawl.Add(new CrawledSite(url, newDepth));
-        }
-
-        return sitesToCrawl;
-    }
-
-    public static List<string> ParseLinks(string inputString, string parentUrl)
-    {
-        List<string> links = new List<string>();
-        Uri uri = new Uri(parentUrl);
-        foreach (Match match in Regex.Matches(inputString, "<a\\s+(?:[^>]*?\\s+)?href=([\"\'])(.*?)[\"\']"))
-        {
-            string link = match.Groups[2].ToString();
-
-            if (link.StartsWith("http"))
-            {
-                links.Add(link);
-            }
-            else if (link.StartsWith("/"))
-            {
-                links.Add($"{uri.Scheme}://{uri.Host}{link}");
-            }
-            else
-            {
-                if (uri.AbsolutePath.EndsWith("/"))
-                {
-                    links.Add($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}{link}");
-                }
-                else
-                {
-                    links.Add($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{link}");
-                }
-            }
-        }
-
-        return links;
-    }
-
-
 
     public async Task StartAsync()
     {
@@ -141,7 +86,7 @@ public class SmartCrawler
         await Task.WhenAll(tasks);
     }
 
-    public List<CrawledSite> GetFinalList()
+    public List<dynamic> GetFinalList()
     {
         return _storage.Export();
     }

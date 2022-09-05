@@ -2,12 +2,14 @@
 
 public class HtmlScraper
 {
+    // TODO: test if we need one client for every parallel process
+    private static readonly HttpClient Client = new HttpClient();
+
     public static async Task<ScraperResponse> ScrapeUrl(string url)
     {
         try
         {
-            HttpClient client = new HttpClient();
-            string html = await client.GetStringAsync(url);
+            string html = await Client.GetStringAsync(url);
             return new ScraperResponse(true, false, html);
         }
         catch (TaskCanceledException)

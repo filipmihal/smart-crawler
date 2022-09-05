@@ -14,7 +14,7 @@ public class LinkParserTest
         string validHtml = @"<h2>Absolute URLs</h2>
             <p><a href=""https://www.w3.org/"">W3C</a></p>
             <p><a href='https://www.google.com/'>Google</a></p>";
-        var actual = SmartCrawler.SmartCrawler.ParseLinks(validHtml, "https://www.w3.org");
+        var actual = SmartCrawler.CrawlerHelpers.ParseLinks(validHtml, "https://www.w3.org");
         CollectionAssert.AreEqual(expected, actual);
     }
     
@@ -25,7 +25,7 @@ public class LinkParserTest
         string validHtml = @"<h1>Absolute URLs
             <p>nn    <a href=""https://www.w3.org/"">W3C</p>
             <p><a href='https://www.google.com/>Google</a></p>";
-        var actual = SmartCrawler.SmartCrawler.ParseLinks(validHtml, "https://www.w3.org");
+        var actual = SmartCrawler.CrawlerHelpers.ParseLinks(validHtml, "https://www.w3.org");
         CollectionAssert.AreEqual(expected, actual);
     }
     
@@ -36,7 +36,7 @@ public class LinkParserTest
         string validHtml = @"<h2>Relative URLs</h2>
             <p><a href=""html_images.asp"">HTML Images</a></p>
             <p><a href='/css/default.asp'>CSS Tutorial</a></p>";
-        var actual = SmartCrawler.SmartCrawler.ParseLinks(validHtml, "https://www.w3.org/ahoj");
+        var actual = SmartCrawler.CrawlerHelpers.ParseLinks(validHtml, "https://www.w3.org/ahoj");
         CollectionAssert.AreEqual(expected, actual);
     }
     
@@ -47,7 +47,7 @@ public class LinkParserTest
         string validHtml = @"<h2>Relative URLs</h2>
             <p><a href=""html_images.asp"">HTML Images</a></p>
             <p><a href='/css/default.asp'>CSS Tutorial</a></p>";
-        var actual = SmartCrawler.SmartCrawler.ParseLinks(validHtml, "https://www.w3.org/ahoj/hello/?val=true");
+        var actual = SmartCrawler.CrawlerHelpers.ParseLinks(validHtml, "https://www.w3.org/ahoj/hello/?val=true");
         CollectionAssert.AreEqual(expected, actual);
     }
 }
