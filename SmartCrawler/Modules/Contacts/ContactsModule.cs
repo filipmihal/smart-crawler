@@ -1,11 +1,19 @@
+using System.Text.RegularExpressions;
+
 namespace SmartCrawler.Modules.Contacts;
 
 public class ContactsModule: IBaseModuleSetup<ContactsDataset>
 {
+    public string[] MatchEmails(string text)
+    {
+        Regex emailRegex = new Regex("([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})");
+        var matches = emailRegex.Matches(text);
+        return matches.Select(a => a.Value).ToArray();
+    }
+
     public ContactsDataset Process(string html)
     {
-        
-        // TODO: implement real contact scraper
+       
         ContactsDataset contacts = new ContactsDataset(new []{""}, new []{""}, new []{""});
 
         return contacts;
