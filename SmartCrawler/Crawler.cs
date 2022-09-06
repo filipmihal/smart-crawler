@@ -2,17 +2,33 @@ using SmartCrawler.Modules;
 
 namespace SmartCrawler;
 
-public class SmartCrawler
+public class Crawler
 {
     private readonly CrawlerOptions _options;
     private readonly CrawledSite[] _initialUrlList;
-    private readonly AsyncStorage<dynamic> _storage = new AsyncStorage<dynamic>();
+    private readonly AsyncStorage<DatasetItem> _storage = new AsyncStorage<DatasetItem>();
+    private readonly IBaseModule[]? _modules;
 
 
-    public SmartCrawler(CrawlerOptions options, string[] initialUrlArray)
+    public Crawler(CrawlerOptions options, string[] initialUrlArray, IBaseModule[]? modules = null)
     {
+        _modules = modules;
         _options = options;
         _initialUrlList = ConvertInitialUrlArrayToList(initialUrlArray);
+    }
+
+    private Crawler(CrawlerOptions options, CrawledSite[] sites,  IBaseModule[]? modules = null)
+    {
+        _initialUrlList = sites;
+        _options = options;
+        _modules = modules;
+    }
+    
+    public Crawler Rebuild(IBaseModule newModule)
+    {
+        var newModules = _modules != null ? _modules.Concat(new[] { newModule }).ToArray() : new[] { newModule };
+
+        return new Crawler(_options, _initialUrlList, newModules);
     }
 
     private CrawledSite[] ConvertInitialUrlArrayToList(string[] urls)
@@ -26,7 +42,7 @@ public class SmartCrawler
 
         return list;
     }
-    private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<dynamic> storage, ThreadState threadState, int threadId)
+    private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<DatasetItem> storage, ThreadState threadState, int threadId, Action<string, DatasetItem>[] actions)
     {
         while (true)
         {
@@ -59,34 +75,68 @@ public class SmartCrawler
                 continue;
 
             }
+
+            DatasetItem datasetItem = new DatasetItem(siteToCrawl.Url);
+
             if (siteToCrawl.DepthsLeft > 0 && _options.DepthOptions.HasValue)
             {
                 List<string> links = CrawlerHelpers.ParseLinks(response.Html, siteToCrawl.Url);
                 List<CrawledSite> sites = CrawlerHelpers.FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1, _options.DepthOptions.Value.VisitCrossDomain, siteToCrawl.Url);
                 uniqueQueue.EnqueueList(sites);
-
+                datasetItem.SubUrls = links.ToArray();
+                datasetItem.Depth = _options.DepthOptions.Value.CrawlingDepth - siteToCrawl.DepthsLeft;
             }
-            storage.Add(siteToCrawl);
+            
+            ProcessModules(actions, response.Html, datasetItem);
+            
+            storage.Add(datasetItem);
         }
     }
 
+    private void ProcessModules(Action<string, DatasetItem>[] actions, string html, DatasetItem item)
+    {
+        
+            foreach (var action in actions)
+            {
+                action(html, item);
+            }
+    }
+
+    private Action<string, DatasetItem>[] SetupModules()
+    {
+        if (_modules != null)
+        {
+            Action<string, DatasetItem>[] actions = new Action<string, DatasetItem>[_modules.Length];
+            for (int i = 0; i < _modules.Length; i++)
+            {
+                actions[i] = _modules[i].Setup();
+            }
+
+            return actions;
+
+        }
+
+        return Array.Empty<Action<string, DatasetItem>>();
+
+    }
     public async Task StartAsync()
     {
         AsyncUniqueQueue<CrawledSite> uniqueQueue = new AsyncUniqueQueue<CrawledSite>(_initialUrlList);
         ThreadState threadState = new ThreadState(_options.ParallelCrawlers);
+        Action<string, DatasetItem>[] actions = SetupModules();
 
         List<Task> tasks = new List<Task>();
 
         for (var i = 0; i < _options.ParallelCrawlers; i++)
         {
             int threadId = i;
-            tasks.Add(Task.Run(async () => await Crawl(uniqueQueue, _storage, threadState, threadId)));
+            tasks.Add(Task.Run(async () => await Crawl(uniqueQueue, _storage, threadState, threadId, actions)));
         }
 
         await Task.WhenAll(tasks);
     }
 
-    public List<dynamic> GetFinalList()
+    public List<DatasetItem> GetFinalList()
     {
         return _storage.Export();
     }
