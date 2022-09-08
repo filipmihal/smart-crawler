@@ -11,10 +11,24 @@ public class ContactsModule: IBaseModuleSetup<ContactsDataset>
         return matches.Select(a => a.Value).ToArray();
     }
 
+    public string[] MatchPhoneNumbers(string text)
+    {
+        Regex pnRegex = new Regex("((\\+\\d{1,3}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{3,4})|(\\+\\d{10,13})");
+        var matches = pnRegex.Matches(text);
+        return matches.Select(a => a.Value).ToArray();
+    }
+
+    public string[] MatchFacebooks(string text)
+    {
+        Regex pnRegex = new Regex(@"(?:http(?:s)?:\/\/)?(?:www\.)?(?:facebook\.com|fb\.com)\/[a-z|\/|0-9|*'();:@&=+$,/?%#]*");
+        var matches = pnRegex.Matches(text);
+        return matches.Select(a => a.Value).ToArray();
+    }
+
     public ContactsDataset Process(string html)
     {
        
-        ContactsDataset contacts = new ContactsDataset(new []{""}, new []{""}, new []{""});
+        ContactsDataset contacts = new ContactsDataset(new []{""}, new []{""}, new []{""}, new []{""});
 
         return contacts;
     }
