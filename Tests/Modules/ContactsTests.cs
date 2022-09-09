@@ -4,7 +4,7 @@ namespace Tests.Modules;
 
 public class ContactsTests
 {
-    ContactsModule _module = new ContactsModule();
+    ContactsModule _module = new ContactsModule(scrapeSocial: true);
 
     [SetUp]
     public void Setup()

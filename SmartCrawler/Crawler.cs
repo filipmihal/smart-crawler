@@ -2,13 +2,14 @@ using SmartCrawler.Modules;
 
 namespace SmartCrawler;
 
+
 public class Crawler
 {
     private readonly CrawlerOptions _options;
     private readonly CrawledSite[] _initialUrlList;
     private readonly AsyncStorage<DatasetItem> _storage = new AsyncStorage<DatasetItem>();
     private readonly IBaseModule[]? _modules;
-
+    private readonly CrawlerStatus _status = new CrawlerStatus();
 
     public Crawler(CrawlerOptions options, string[] initialUrlArray, IBaseModule[]? modules = null)
     {
@@ -44,53 +45,58 @@ public class Crawler
     }
     private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<DatasetItem> storage, ThreadState threadState, int threadId, Action<string, DatasetItem>[] actions)
     {
+
         while (true)
         {
-            CrawledSite siteToCrawl;
-            try
-            {
-                siteToCrawl = uniqueQueue.Dequeue();
-                threadState.UpdateState(threadId, false);
-            }
-            catch (InvalidOperationException)
-            {
-                if (threadState.UpdateAndCanFinish(threadId, true))
+                CrawledSite siteToCrawl;
+                try
                 {
-                    return;
+                    siteToCrawl = uniqueQueue.Dequeue();
+                    threadState.UpdateState(threadId, false);
                 }
-                continue;
-            }
-            ScraperResponse response = await HtmlScraper.ScrapeUrl(siteToCrawl.Url);
-            if (!response.IsSuccessful)
-            {
-                if (!response.IsCritical)
+                catch (InvalidOperationException)
                 {
-                    if (siteToCrawl.Retries > 0)
+                    if (threadState.UpdateAndCanFinish(threadId, true))
                     {
-                        siteToCrawl.Retries -= 1;
-                        uniqueQueue.Enqueue(siteToCrawl);
+                        return;
                     }
+
+                    continue;
                 }
 
-                continue;
+                ScraperResponse response = await HtmlScraper.ScrapeUrl(siteToCrawl.Url);
+                if (!response.IsSuccessful)
+                {
+                    if (!response.IsCritical)
+                    {
+                        if (siteToCrawl.Retries > 0)
+                        {
+                            siteToCrawl.Retries -= 1;
+                            uniqueQueue.Enqueue(siteToCrawl);
+                        }
+                    }
 
-            }
+                    continue;
 
-            DatasetItem datasetItem = new DatasetItem(siteToCrawl.Url);
+                }
 
-            if (siteToCrawl.DepthsLeft > 0 && _options.DepthOptions.HasValue)
-            {
-                List<string> links = CrawlerHelpers.ParseLinks(response.Html, siteToCrawl.Url);
-                List<CrawledSite> sites = CrawlerHelpers.FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1, _options.DepthOptions.Value.VisitCrossDomain, siteToCrawl.Url);
-                uniqueQueue.EnqueueList(sites);
-                datasetItem.SubUrls = links.ToArray();
-                datasetItem.Depth = _options.DepthOptions.Value.CrawlingDepth - siteToCrawl.DepthsLeft;
-            }
-            
-            ProcessModules(actions, response.Html, datasetItem);
-            
-            storage.Add(datasetItem);
+                DatasetItem datasetItem = new DatasetItem(siteToCrawl.Url);
+
+                if (siteToCrawl.DepthsLeft > 0 && _options.DepthOptions.HasValue)
+                {
+                    List<string> links = CrawlerHelpers.ParseLinks(response.Html, siteToCrawl.Url);
+                    List<CrawledSite> sites = CrawlerHelpers.FilterAndFormatUrls(links, siteToCrawl.DepthsLeft - 1,
+                        _options.DepthOptions.Value.VisitCrossDomain, siteToCrawl.Url);
+                    uniqueQueue.EnqueueList(sites);
+                    datasetItem.SubUrls = links.ToArray();
+                    datasetItem.Depth = _options.DepthOptions.Value.CrawlingDepth - siteToCrawl.DepthsLeft;
+                }
+
+                ProcessModules(actions, response.Html, datasetItem);
+
+                storage.Add(datasetItem);
         }
+
     }
 
     private void ProcessModules(Action<string, DatasetItem>[] actions, string html, DatasetItem item)
@@ -121,6 +127,10 @@ public class Crawler
     }
     public async Task StartAsync()
     {
+        lock (_status)
+        {
+            _status.CrawlingInProgress = true;
+        }
         AsyncUniqueQueue<CrawledSite> uniqueQueue = new AsyncUniqueQueue<CrawledSite>(_initialUrlList);
         ThreadState threadState = new ThreadState(_options.ParallelCrawlers);
         Action<string, DatasetItem>[] actions = SetupModules();
@@ -134,10 +144,23 @@ public class Crawler
         }
 
         await Task.WhenAll(tasks);
+        lock (_status)
+        {
+            _status.CrawlingInProgress = false;
+        }
     }
 
     public List<DatasetItem> GetFinalList()
     {
+        lock (_status)
+        {
+            if (_status.CrawlingInProgress)
+            {
+                throw new CrawlingInProgressException();
+            }
+        }
         return _storage.Export();
     }
 }
+
+public class CrawlingInProgressException: Exception{}
