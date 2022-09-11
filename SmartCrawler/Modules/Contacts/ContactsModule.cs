@@ -47,7 +47,7 @@ public class ContactsModule: IBaseModuleSetup<ContactsDataset>
         {
             var linkedIns = MatchLinkedIns(html);
             var facebooks = MatchFacebooks(html);
-            return new ContactsDataset(emails, phoneNumbers, linkedIns, facebooks);
+            return new ContactsDataset(emails, phoneNumbers){LinkedIns = linkedIns, Facebooks = facebooks};
         }
         
         ContactsDataset contacts = new ContactsDataset(emails, phoneNumbers);

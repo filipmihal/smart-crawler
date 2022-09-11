@@ -2,16 +2,14 @@ namespace SmartCrawler.Modules.Contacts;
 
 public struct ContactsDataset
 {
-    public readonly string[] Emails;
-    public readonly string[] PhoneNumbers;
-    public readonly string[]? LinkedIns;
-    public readonly string[]? Facebooks;
+    public string[] Emails { get; }
+    private string[] PhoneNumbers { get; }
+    public string[]? LinkedIns { get; init; } = null;
+    public string[]? Facebooks { get; init; } = null;
 
-    public ContactsDataset(string[] emails, string[] phoneNumbers, string[]? linkedIns = null, string[]? facebooks = null)
+    public ContactsDataset(string[] emails, string[] phoneNumbers)
     {
         Emails = emails;
         PhoneNumbers = phoneNumbers;
-        LinkedIns = linkedIns;
-        Facebooks = facebooks;
     }
 }

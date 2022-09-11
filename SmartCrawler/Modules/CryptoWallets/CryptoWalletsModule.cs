@@ -20,6 +20,15 @@ public class CryptoWalletsModule : IBaseModuleSetup<CryptoWalletsDataset>
 
     public Action<string, DatasetItem> Setup()
     {
-        return (string html, DatasetItem item) =>{};
+        return (string html, DatasetItem item) => { item.Wallets = Process(html);};
+    }
+}
+
+public static class CrawlerExtensionContacts
+{
+
+    public static Crawler CryptoWallets(this Crawler crawler)
+    {
+        return crawler.Rebuild(new CryptoWalletsModule());
     }
 }
