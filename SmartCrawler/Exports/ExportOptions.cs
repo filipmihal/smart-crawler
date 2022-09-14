@@ -2,17 +2,16 @@ namespace SmartCrawler.Exports;
 
 public enum UrlExportSeparator
 {
-    Domain,
     Url,
     SingleFile
 }
 
-public struct Options
+public struct ExportOptions
 {
-    public Options()
+    public ExportOptions()
     {
     }
 
     public UrlExportSeparator Separator { get; init; } = UrlExportSeparator.SingleFile;
-    public string Filename { get; init; } = "exportedData";
+    public string FilePrefix { get; init; } = "exportedData";
 }

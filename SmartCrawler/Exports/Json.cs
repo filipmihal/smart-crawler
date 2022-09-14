@@ -4,20 +4,47 @@ using SmartCrawler.Modules;
 
 namespace SmartCrawler.Exports;
 
-public class Json: Base
+public class Json: ExportBase
 {
+    public override string GetExtension()
+    {
+        return "json";
+    }
+
     public override void Export(List<DatasetItem> items)
     {
         JsonSerializerOptions options = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
-        string exportedJson = JsonSerializer.Serialize<List<DatasetItem>>(items, options);
+        switch (ExportOptions.Separator)
+        {
+            case UrlExportSeparator.Url:
+            {
+                for (int idx = 0; idx < items.Count; idx++)
+                { 
+                    string exportedJson = JsonSerializer.Serialize<DatasetItem>(items[idx], options);
+                    string digits = "D" + items.Count;
+                    File.WriteAllText($@"exported_url_{idx.ToString(digits)}.{GetExtension()}", exportedJson);
+                }
+                break;
+            }
+            case UrlExportSeparator.SingleFile:
+            {
+                string exportedJson = JsonSerializer.Serialize<List<DatasetItem>>(items, options);
+                File.WriteAllText($@"exported_data.{GetExtension()}", exportedJson);
+                break;
+            }
+            default:
+                throw new ExportSeparatorNotFoundException();
+        }
     }
     
-    public Json(Options options) : base(options)
+    public Json(ExportOptions exportOptions) : base(exportOptions)
     {
         
     }
     
 }
+
+public class ExportSeparatorNotFoundException : Exception{}

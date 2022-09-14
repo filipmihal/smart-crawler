@@ -1,3 +1,4 @@
+using SmartCrawler.Exports;
 using SmartCrawler.Modules;
 
 namespace SmartCrawler;
@@ -160,6 +161,12 @@ public class Crawler
             }
         }
         return _storage.Export();
+    }
+
+    public void ExportDataset(ExportOptions exportOptions, ExportType type)
+    {
+        ExportBase exportService = ExportFactory.GenerateExport(type, exportOptions);
+        exportService.Export(GetFinalList());
     }
 }
 

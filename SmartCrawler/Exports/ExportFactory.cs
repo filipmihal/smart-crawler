@@ -1,15 +1,14 @@
-using Type = System.Type;
 
 namespace SmartCrawler.Exports;
 
-public static class Generator
+public static class ExportFactory
 {
-    public static Base MatchExport(Type exportType, Options options)
+    public static ExportBase GenerateExport(ExportType exportType, ExportOptions exportOptions)
     {
         switch (exportType)
         {
-            case Type.Json:
-                return new Json(options);
+            case ExportType.Json:
+                return new Json(exportOptions);
             default:
                 throw new ExportTypeNotFoundException();
         }
