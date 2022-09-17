@@ -5,4 +5,5 @@ public enum ExportType
 {
     Json,
     Txt,
+    Sql,
 }

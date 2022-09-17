@@ -9,6 +9,8 @@ public static class ExportFactory
         {
             case ExportType.Json:
                 return new Json(exportOptions);
+            case ExportType.Sql:
+                return new Sql(exportOptions);
             default:
                 throw new ExportTypeNotFoundException();
         }
