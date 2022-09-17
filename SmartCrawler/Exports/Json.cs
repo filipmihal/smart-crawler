@@ -4,14 +4,14 @@ using SmartCrawler.Modules;
 
 namespace SmartCrawler.Exports;
 
-public class Json: ExportBase
+public class Json<T>: ExportBase<T>
 {
     public override string GetExtension()
     {
         return "json";
     }
 
-    public override void Export(List<DatasetItem> items)
+    public override void Export(List<T> items)
     {
         JsonSerializerOptions options = new()
         {
@@ -23,7 +23,7 @@ public class Json: ExportBase
             {
                 for (int idx = 0; idx < items.Count; idx++)
                 { 
-                    string exportedJson = JsonSerializer.Serialize<DatasetItem>(items[idx], options);
+                    string exportedJson = JsonSerializer.Serialize<T>(items[idx], options);
                     string digits = "D" + items.Count;
                     File.WriteAllText($@"exported_url_{idx.ToString(digits)}.{GetExtension()}", exportedJson);
                 }
@@ -31,7 +31,7 @@ public class Json: ExportBase
             }
             case UrlExportSeparator.SingleFile:
             {
-                string exportedJson = JsonSerializer.Serialize<List<DatasetItem>>(items, options);
+                string exportedJson = JsonSerializer.Serialize<List<T>>(items, options);
                 File.WriteAllText($@"exported_data.{GetExtension()}", exportedJson);
                 break;
             }

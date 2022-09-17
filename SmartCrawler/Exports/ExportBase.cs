@@ -4,7 +4,7 @@ namespace SmartCrawler.Exports;
 
 
 
-public abstract class ExportBase 
+public abstract class ExportBase<T> 
 {
     protected ExportOptions ExportOptions { get; }
 
@@ -15,5 +15,5 @@ public abstract class ExportBase
 
     public abstract string GetExtension();
 
-    public abstract void Export(List<DatasetItem> items);
+    public abstract void Export(List<T> items);
 }

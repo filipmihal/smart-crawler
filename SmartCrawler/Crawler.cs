@@ -165,7 +165,7 @@ public class Crawler
 
     public void ExportDataset(ExportOptions exportOptions, ExportType type)
     {
-        ExportBase exportService = ExportFactory.GenerateExport(type, exportOptions);
+        var exportService = ExportFactory.GenerateExport(type, exportOptions);
         exportService.Export(GetFinalList());
     }
 }

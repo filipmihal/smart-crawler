@@ -13,7 +13,7 @@ public struct SupportedType
     public Type Type;
     public string SqlEquivalent;
 }
-public class Sql: ExportBase
+public class Sql<T>: ExportBase<T>
 {
     private static SupportedType[] SupportedTypes = new[]
     {
@@ -23,7 +23,8 @@ public class Sql: ExportBase
         new SupportedType(typeof(decimal), "DECIMAL"),
         new SupportedType(typeof(float), "FLOAT"),
         new SupportedType(typeof(double), "DOUBLE"),
-        new SupportedType(typeof(DateTime), "DATETIME")
+        new SupportedType(typeof(DateTime), "DATETIME"),
+        new SupportedType(typeof(string[]), "TEXT"),
     };
 
     public static bool IsTypeSupported(Type type)
@@ -36,31 +37,45 @@ public class Sql: ExportBase
         return "sql";
     }
 
-    private string BuildTable(DatasetItem sample)
+    private static string BuildTableRecursively(Type type, object sample, string prefix)
     {
-        string tableSql = "CREATE TABLE CRAWLED_DATA (";
-        Type dataset = typeof(DatasetItem);
-        var properties = dataset.GetProperties();
+        string tableSql = "";
+        var properties = type.GetProperties();
         foreach (var property in properties)
         {
-            if (IsTypeSupported(property.PropertyType) && property.GetValue(sample) is not null)
+            var propertyValue = property.GetValue(sample);
+            if (IsTypeSupported(property.PropertyType) && propertyValue is not null)
             {
+                // TODO: convert arrays
                 tableSql +=
-                    $"\n{property.Name} {Array.Find(SupportedTypes, (type) => type.Type == property.PropertyType).SqlEquivalent},";
+                    $"\n{prefix}{property.Name} {Array.Find(SupportedTypes, (type) => type.Type == property.PropertyType).SqlEquivalent},";
             
             }
-            // TODO: Add recursion
-            // Console.WriteLine(property.GetValue(sample) is null);
+            else if (propertyValue is not null && !property.PropertyType.IsValueType)
+            {
+                string newPrefix = property.Name + "_";
+                tableSql += $"{BuildTableRecursively(property.PropertyType, propertyValue, newPrefix)}";
+            }
         }
 
+        return tableSql;
+    }
+
+    public string BuildTable(T sample)
+    {
+        string tableSql = "CREATE TABLE CRAWLED_DATA (";
+        Type dataset = typeof(T);
+        var properties = dataset.GetProperties();
+        if (sample != null) tableSql += BuildTableRecursively(dataset, sample, "");
+        tableSql = tableSql.Substring(0,tableSql.Length-1);
         return tableSql + ");";
     }
 
-    public override void Export(List<DatasetItem> items)
+    public override void Export(List<T> items)
     {
         if (items.Count == 0)
         {
-            throw new NoDataForSQLExport();
+            throw new NoDataForSqlExportException();
         }
         Console.WriteLine(BuildTable(items[0]));
     }
@@ -72,4 +87,4 @@ public class Sql: ExportBase
     
 }
 
-public class NoDataForSQLExport : Exception{}
+public class NoDataForSqlExportException : Exception{}
