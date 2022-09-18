@@ -2,6 +2,13 @@ using SmartCrawler.Modules;
 
 namespace SmartCrawler.Exports;
 
+public enum SqlCrawlType
+{
+    NewTable,
+    Columns,
+    Values
+    
+}
 public struct SupportedType
 {
     public SupportedType(Type type, string sqlEquivalent)
@@ -27,6 +34,29 @@ public class Sql<T>: ExportBase<T>
         new SupportedType(typeof(string[]), "TEXT"),
     };
 
+    private static string ConvertValue(SupportedType type, object propValue)
+    {
+        if (type.Type == typeof(string[]))
+        {
+            string[]? newVal = (string[]) propValue!;
+            return "'" + string.Join("','", newVal) + "'";
+        }
+
+        string? result = propValue.ToString();
+
+        if (result is null)
+        {
+            throw new SqlExportMismatchException();
+        }
+        
+        if (type.Type == typeof(string))
+        {
+            return "'" + result + "'";
+        } 
+
+        return result;
+    }
+
     public static bool IsTypeSupported(Type type)
     {
         return  SupportedTypes.Any(supportedType => supportedType.Type == type);
@@ -37,28 +67,49 @@ public class Sql<T>: ExportBase<T>
         return "sql";
     }
 
-    private static string BuildTableRecursively(Type type, object sample, string prefix)
+    private static List<string> CrawlTypeRecursively(Type type, object sample, string prefix, SqlCrawlType crawlType)
     {
-        string tableSql = "";
+        List<string> sql = new List<string>();
         var properties = type.GetProperties();
         foreach (var property in properties)
         {
             var propertyValue = property.GetValue(sample);
             if (IsTypeSupported(property.PropertyType) && propertyValue is not null)
             {
-                // TODO: convert arrays
-                tableSql +=
-                    $"\n{prefix}{property.Name} {Array.Find(SupportedTypes, (type) => type.Type == property.PropertyType).SqlEquivalent},";
-            
+                SupportedType supportedType =
+                    Array.Find(SupportedTypes, (supType) => supType.Type == property.PropertyType);
+                switch (crawlType)
+                {
+                    case   SqlCrawlType.NewTable:
+                        // TODO: convert array
+                        sql.Add($"{prefix}{property.Name} {supportedType.SqlEquivalent}");
+                        break;
+                    case SqlCrawlType.Values:
+                        string convertedValue = ConvertValue(supportedType, propertyValue);
+                        sql.Add(convertedValue);
+                        break;
+                    case SqlCrawlType.Columns:
+                        sql.Add($"{prefix}{property.Name}");
+                        break;
+                }
             }
             else if (propertyValue is not null && !property.PropertyType.IsValueType)
             {
                 string newPrefix = property.Name + "_";
-                tableSql += $"{BuildTableRecursively(property.PropertyType, propertyValue, newPrefix)}";
+                sql.AddRange(CrawlTypeRecursively(property.PropertyType, propertyValue, newPrefix, crawlType));
             }
         }
 
-        return tableSql;
+        return sql;
+    }
+
+    public string BuildInserts(T sample)
+    {
+        Type dataset = typeof(T);
+        string tableSql = "INSERT INTO CRAWLED_DATA (";
+        List<string> data = CrawlTypeRecursively(dataset, sample, "", SqlCrawlType.Columns);
+
+        return tableSql + string.Join(',', data) + ");";
     }
 
     public string BuildTable(T sample)
@@ -66,10 +117,14 @@ public class Sql<T>: ExportBase<T>
         string tableSql = "CREATE TABLE CRAWLED_DATA (";
         Type dataset = typeof(T);
         var properties = dataset.GetProperties();
-        if (sample != null) tableSql += BuildTableRecursively(dataset, sample, "");
-        tableSql = tableSql.Substring(0,tableSql.Length-1);
+        if (sample is not null)
+        {
+            var columns = CrawlTypeRecursively(dataset, sample, "", SqlCrawlType.NewTable);
+            tableSql += string.Join("\n,", columns);
+        }
         return tableSql + ");";
     }
+    
 
     public override void Export(List<T> items)
     {
@@ -77,7 +132,11 @@ public class Sql<T>: ExportBase<T>
         {
             throw new NoDataForSqlExportException();
         }
-        Console.WriteLine(BuildTable(items[0]));
+
+        string tableConstruction = BuildTable(items[0]);
+        
+        
+        
     }
     
     public Sql(ExportOptions exportOptions) : base(exportOptions)
@@ -88,3 +147,4 @@ public class Sql<T>: ExportBase<T>
 }
 
 public class NoDataForSqlExportException : Exception{}
+public class SqlExportMismatchException : Exception{}
