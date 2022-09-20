@@ -1,5 +1,3 @@
-using SmartCrawler.Modules;
-
 namespace SmartCrawler.Exports;
 
 public enum SqlCrawlType
@@ -7,7 +5,7 @@ public enum SqlCrawlType
     NewTable,
     Columns,
     Values
-    
+
 }
 public struct SupportedType
 {
@@ -20,7 +18,7 @@ public struct SupportedType
     public Type Type;
     public string SqlEquivalent;
 }
-public class Sql<T>: ExportBase<T>
+public class Sql<T> : ExportBase<T>
 {
     private static SupportedType[] SupportedTypes = new[]
     {
@@ -38,7 +36,7 @@ public class Sql<T>: ExportBase<T>
     {
         if (type.Type == typeof(string[]))
         {
-            string[]? newVal = (string[]) propValue!;
+            string[]? newVal = (string[])propValue!;
             return "'" + string.Join("','", newVal) + "'";
         }
 
@@ -48,20 +46,20 @@ public class Sql<T>: ExportBase<T>
         {
             throw new SqlExportMismatchException();
         }
-        
+
         if (type.Type == typeof(string))
         {
             return "'" + result + "'";
-        } 
+        }
 
         return result;
     }
 
     public static bool IsTypeSupported(Type type)
     {
-        return  SupportedTypes.Any(supportedType => supportedType.Type == type);
+        return SupportedTypes.Any(supportedType => supportedType.Type == type);
     }
-        
+
     public override string GetExtension()
     {
         return "sql";
@@ -80,8 +78,7 @@ public class Sql<T>: ExportBase<T>
                     Array.Find(SupportedTypes, (supType) => supType.Type == property.PropertyType);
                 switch (crawlType)
                 {
-                    case   SqlCrawlType.NewTable:
-                        // TODO: convert array
+                    case SqlCrawlType.NewTable:
                         sql.Add($"{prefix}{property.Name} {supportedType.SqlEquivalent}");
                         break;
                     case SqlCrawlType.Values:
@@ -124,7 +121,7 @@ public class Sql<T>: ExportBase<T>
         }
         return tableSql + ");";
     }
-    
+
 
     public override void Export(List<T> items)
     {
@@ -134,17 +131,17 @@ public class Sql<T>: ExportBase<T>
         }
 
         string tableConstruction = BuildTable(items[0]);
-        
-        
-        
+
+
+
     }
-    
+
     public Sql(ExportOptions exportOptions) : base(exportOptions)
     {
-        
+
     }
-    
+
 }
 
-public class NoDataForSqlExportException : Exception{}
-public class SqlExportMismatchException : Exception{}
+public class NoDataForSqlExportException : Exception { }
+public class SqlExportMismatchException : Exception { }
