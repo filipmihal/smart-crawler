@@ -1,5 +1,8 @@
 namespace SmartCrawler;
 
+/**
+ * Stores states of all threads that are being used and provides a simple API about the overall threads state 
+ */
 public class ThreadState
 {
     private bool[] _finishedStates;

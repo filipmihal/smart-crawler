@@ -2,6 +2,9 @@ using System.Reflection.Metadata;
 
 namespace SmartCrawler;
 
+/***
+ * Thread-safe list
+ */
 public class AsyncStorage<T>
 {
     private readonly List<T> _list = new List<T>();

@@ -5,6 +5,9 @@ public interface IAsyncQueueItem
     public string GetKey();
 }
 
+/**
+ * Thread-safe queue that only enqueues unique items
+ */
 public class AsyncUniqueQueue<T> where T : IAsyncQueueItem
 
 {
