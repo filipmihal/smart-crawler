@@ -20,6 +20,7 @@ public struct SupportedType
 }
 public class Sql<T> : ExportBase<T>
 {
+    private static string tableName = "CRAWLED_DATA";
     private static SupportedType[] SupportedTypes = new[]
     {
         new SupportedType(typeof(bool), "BOOL"),
@@ -100,13 +101,13 @@ public class Sql<T> : ExportBase<T>
         return sql;
     }
 
-    public string BuildInserts(T sample)
+    public string BuildInsert(T sample)
     {
         Type dataset = typeof(T);
         string tableSql = "INSERT INTO CRAWLED_DATA (";
         List<string> data = CrawlTypeRecursively(dataset, sample, "", SqlCrawlType.Columns);
 
-        return tableSql + string.Join(',', data) + ");";
+        return tableSql + string.Join(',', data) + ")";
     }
 
     public string BuildTable(T sample)
@@ -122,6 +123,22 @@ public class Sql<T> : ExportBase<T>
         return tableSql + ");";
     }
 
+    public string BuildRows(List<T> dataset)
+    {
+        string finalString = "VALUES\n";
+        Type datasetType = typeof(T);
+        List<string> rows = new List<string>();
+        foreach (var item in dataset)
+        {
+            var values = CrawlTypeRecursively(datasetType, item, "", SqlCrawlType.Values);
+            rows.Add("(" + string.Join(",", values) + ")");
+        }
+
+        finalString += string.Join(",\n", rows);
+
+        return finalString;
+    }
+
 
     public override void Export(List<T> items)
     {
@@ -130,8 +147,18 @@ public class Sql<T> : ExportBase<T>
             throw new NoDataForSqlExportException();
         }
 
-        string tableConstruction = BuildTable(items[0]);
+        if (ExportOptions.Separator == UrlExportSeparator.Url)
+        {
+            throw new SqlUnsupportedSeparatorException();
+        }
 
+        string tableConstruction = BuildTable(items[0]);
+        string insert = BuildInsert(items[0]);
+        string rows = BuildRows(items);
+
+        string finalSql = tableConstruction + "\n\n" + insert + "\n\n" + rows;
+
+        File.WriteAllText($@"exported_data.{GetExtension()}", finalSql);
 
 
     }
@@ -145,3 +172,4 @@ public class Sql<T> : ExportBase<T>
 
 public class NoDataForSqlExportException : Exception { }
 public class SqlExportMismatchException : Exception { }
+public class SqlUnsupportedSeparatorException : Exception { }

@@ -2,7 +2,10 @@ namespace SmartCrawler;
 
 public static class UriExtensionMethods
 {
-  
+
+    /**
+     * Strip host of sub domains and extensions
+     */
     public static string CleanHost(this Uri uri)
     {
         string[] names = uri.Host.Split('.');
@@ -14,6 +17,6 @@ public static class UriExtensionMethods
 
         return names[0];
     }
-    
+
 
 }

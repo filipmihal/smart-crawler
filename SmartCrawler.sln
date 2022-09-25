@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCrawlerExample", "Smar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{46267F67-CE92-4977-9227-456A7DCEC8CD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCrawler", "SimpleCrawler\SimpleCrawler.csproj", "{2BC753D1-95F4-4A3A-AAAC-7087B06B1E3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{46267F67-CE92-4977-9227-456A7DCEC8CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46267F67-CE92-4977-9227-456A7DCEC8CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46267F67-CE92-4977-9227-456A7DCEC8CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BC753D1-95F4-4A3A-AAAC-7087B06B1E3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BC753D1-95F4-4A3A-AAAC-7087B06B1E3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BC753D1-95F4-4A3A-AAAC-7087B06B1E3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BC753D1-95F4-4A3A-AAAC-7087B06B1E3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
