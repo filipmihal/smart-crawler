@@ -2,10 +2,11 @@
 using SmartCrawler.Exports;
 using SmartCrawler.Modules.Contacts;
 using SmartCrawler.Urls;
+using SmartCrawlerExample;
 
 
 // 1. Set Crawling options 
-CrawlingDepthOptions depth = new CrawlingDepthOptions(1, false);
+CrawlingDepthOptions depth = new CrawlingDepthOptions(0, false);
 CrawlerOptions option = new CrawlerOptions(5, 3, depth);
 
 //2. Setup the SmartCrawler
@@ -16,7 +17,6 @@ await crawler.StartAsync();
 var crawledData = crawler.GetFinalList();
 
 
-// todo select title as well
 var emails = from url in crawledData
     where url.Contacts.Value.Emails.Length > 0 && url.Contacts.Value.LinkedIns.Length > 0 && url.Contacts.Value.Facebooks.Length == 0
     select url.Contacts.Value.Emails;
@@ -27,15 +27,14 @@ string message = $"Dear sir or madam," +
                  $"Sincerely," +
                  $"John Smith.";
 
-// todo: send emails
+foreach (var emailsOnUrl in emails)
+{
+    Mock.SendEmail(emailsOnUrl[0], message );
+}
 
 
-// todo: export to json
-// Console.WriteLine(a[0].Contacts.Value.Emails);
+// export to JSON and SQL
 ExportOptions options = new ExportOptions();
 crawler.ExportDataset(options, ExportType.Json);
 crawler.ExportDataset(options, ExportType.Sql);
-
-// SmartCrawler.SmartCrawler.ParseLinks("<a href=\"ahoj\"></a> ddddd <a hraf='cau'>ddd</a>","https://docs.microsoft.com/sk-sk");
-// Json.Export(crawler.GetFinalList());
 

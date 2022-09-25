@@ -3,16 +3,16 @@ using SmartCrawler.Modules;
 
 namespace SmartCrawler.Exports;
 
-public static class ExportFactory
+public static class ExportFactory<T>
 {
-    public static ExportBase<DatasetItem> GenerateExport(ExportType exportType, ExportOptions exportOptions)
+    public static ExportBase<T> GenerateExport(ExportType exportType, ExportOptions exportOptions)
     {
         switch (exportType)
         {
             case ExportType.Json:
-                return new Json<DatasetItem>(exportOptions);
+                return new Json<T>(exportOptions);
             case ExportType.Sql:
-                return new Sql<DatasetItem>(exportOptions);
+                return new Sql<T>(exportOptions);
             default:
                 throw new ExportTypeNotFoundException();
         }
