@@ -2,7 +2,6 @@
 
 public class HtmlScraper
 {
-    // TODO: test if we need one client for every parallel process
     private static readonly HttpClient Client = new HttpClient();
 
     public static async Task<ScraperResponse> ScrapeUrl(string url)
