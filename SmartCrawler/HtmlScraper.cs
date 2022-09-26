@@ -4,6 +4,11 @@ public class HtmlScraper
 {
     private static readonly HttpClient Client = new HttpClient();
 
+    static HtmlScraper()
+    {
+        Client.Timeout = TimeSpan.FromSeconds(20);
+    }
+
     public static async Task<ScraperResponse> ScrapeUrl(string url)
     {
         try
