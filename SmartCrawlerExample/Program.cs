@@ -18,8 +18,8 @@ var crawledData = crawler.GetFinalList();
 
 
 var emails = from url in crawledData
-    where url.Contacts.Value.Emails.Length > 0 && url.Contacts.Value.LinkedIns.Length > 0 && url.Contacts.Value.Facebooks.Length == 0
-    select url.Contacts.Value.Emails;
+    where url.Contacts.Emails.Length > 0 && url.Contacts.LinkedIns.Length > 0 && url.Contacts.Facebooks.Length == 0
+    select url.Contacts.Emails;
 
 string message = $"Dear sir or madam," +
                  $"I am writing you regarding a court case that I am involved in. I've been contacted by IRS regarding some discrepancies in my company's investment fund." +
@@ -32,9 +32,10 @@ foreach (var emailsOnUrl in emails)
     Mock.SendEmail(emailsOnUrl[0], message );
 }
 
-
 // export to JSON and SQL
 ExportOptions options = new ExportOptions();
-crawler.ExportDataset(options, ExportType.Json);
 crawler.ExportDataset(options, ExportType.Sql);
+crawler.ExportDataset(options, ExportType.Json);
+var a = crawler.GetFinalList();
+Console.WriteLine("Ahoj");
 

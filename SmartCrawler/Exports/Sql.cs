@@ -156,7 +156,7 @@ public class Sql<T> : ExportBase<T>
         string insert = BuildInsert(items[0]);
         string rows = BuildRows(items);
 
-        string finalSql = tableConstruction + "\n\n" + insert + "\n\n" + rows;
+        string finalSql = tableConstruction + "\n\n" + insert + "\n\n" + rows + ";";
 
         File.WriteAllText($@"exported_data.{GetExtension()}", finalSql);
 

@@ -1,6 +1,6 @@
 namespace SmartCrawler.Modules.CryptoWallets;
 
-public struct CryptoWalletsDataset
+public class CryptoWalletsDataset
 {
     public string[] Bitcoin { get; }
 

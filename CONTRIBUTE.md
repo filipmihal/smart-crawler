@@ -41,12 +41,12 @@ The most distinctive feature of SmartCrawler is its Modules system. It was argua
 
 ### Module structure
 
-A module must contain a processing function, a setup function, and a module struct.
+A module must contain a processing function, a setup function, and a module dataset class.
 
-- Module struct
-  - Structure of data that are scraped by the module
+- Module dataset class
+  - Structure of data that is scraped by the module
 - Processing function
-  - Contains the scraping logic and returns module struct
+  - Contains the scraping logic and returns module dataset class
 - Setup
   - Matches a DatasetItem property to the result of the processing function
 
