@@ -13,5 +13,5 @@ public struct ExportOptions
     }
 
     public UrlExportSeparator Separator { get; init; } = UrlExportSeparator.SingleFile;
-    public string FilePrefix { get; init; } = "exportedData";
+    public string Filename { get; init; } = "exported_data";
 }

@@ -38,7 +38,7 @@ public class Sql<T> : ExportBase<T>
         if (type.Type == typeof(string[]))
         {
             string[]? newVal = (string[])propValue!;
-            return "'" + string.Join("','", newVal) + "'";
+            return "'" + string.Join(",", newVal) + "'";
         }
 
         string? result = propValue.ToString();
@@ -158,7 +158,7 @@ public class Sql<T> : ExportBase<T>
 
         string finalSql = tableConstruction + "\n\n" + insert + "\n\n" + rows + ";";
 
-        File.WriteAllText($@"exported_data.{GetExtension()}", finalSql);
+        File.WriteAllText($@"{ExportOptions.Filename}.{GetExtension()}", finalSql);
 
 
     }

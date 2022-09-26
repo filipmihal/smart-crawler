@@ -1,10 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SmartCrawler.Modules;
 
 namespace SmartCrawler.Exports;
 
-public class Json<T>: ExportBase<T>
+public class Json<T> : ExportBase<T>
 {
     public override string GetExtension()
     {
@@ -20,31 +19,31 @@ public class Json<T>: ExportBase<T>
         switch (ExportOptions.Separator)
         {
             case UrlExportSeparator.Url:
-            {
-                for (int idx = 0; idx < items.Count; idx++)
-                { 
-                    string exportedJson = JsonSerializer.Serialize<T>(items[idx], options);
-                    string digits = "D" + items.Count;
-                    File.WriteAllText($@"exported_url_{idx.ToString(digits)}.{GetExtension()}", exportedJson);
+                {
+                    for (int idx = 0; idx < items.Count; idx++)
+                    {
+                        string exportedJson = JsonSerializer.Serialize<T>(items[idx], options);
+                        string digits = "D" + items.Count;
+                        File.WriteAllText($@"exported_url_{idx.ToString(digits)}.{GetExtension()}", exportedJson);
+                    }
+                    break;
                 }
-                break;
-            }
             case UrlExportSeparator.SingleFile:
-            {
-                string exportedJson = JsonSerializer.Serialize<List<T>>(items, options);
-                File.WriteAllText($@"exported_data.{GetExtension()}", exportedJson);
-                break;
-            }
+                {
+                    string exportedJson = JsonSerializer.Serialize<List<T>>(items, options);
+                    File.WriteAllText($@"{ExportOptions.Filename}.{GetExtension()}", exportedJson);
+                    break;
+                }
             default:
                 throw new ExportSeparatorNotFoundException();
         }
     }
-    
+
     public Json(ExportOptions exportOptions) : base(exportOptions)
     {
-        
+
     }
-    
+
 }
 
-public class ExportSeparatorNotFoundException : Exception{}
+public class ExportSeparatorNotFoundException : Exception { }
