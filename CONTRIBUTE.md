@@ -1,6 +1,6 @@
 # Contribute (Programming documentation)
 
-When developing SmartCrawler, my main focus was on the speed of the crawler and on providing the best developer experience for those who will use it. A user (developer) should be able to spend a max of 15 minutes reading the documentation and have a working crawler ready in max <!-- TODO: number --> simple steps. Additionally, the scraper shall not only be used on simple crawling tasks but should be easily scalable and serve as a base for complex software projects.
+When developing SmartCrawler, my main focus was on the speed of the crawler and on providing the best developer experience for those who will use it. A user (developer) should be able to spend a max of 15 minutes reading the documentation and have a working crawler ready in max 5 simple steps. Additionally, the scraper shall not only be used on simple crawling tasks but should be easily scalable and serve as a base for complex software projects.
 
 ## Scraping on the low level
 

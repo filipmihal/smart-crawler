@@ -61,7 +61,6 @@ public class SqlTest
     }
 
     [Test]
-    // TODO: add arrays
     public void BuildRowsTest()
     {
         string expectedInsertScript = $"VALUES\n('ahoj','hello',12,'hello2',12,'hello2'),\n('ahoj','hello',12,'hello2',12,'hello2')";
