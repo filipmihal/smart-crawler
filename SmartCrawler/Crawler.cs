@@ -80,14 +80,20 @@ public class Crawler
     }
 
     /// <summary>
-    /// TODO
+    /// Single crawling unit
+    /// Contains all the necessary logic to crawl given sites
     /// </summary>
     /// <param name="uniqueQueue">Unique queue that stores all CrawledSite objects that still needs to be crawled</param>
     /// <param name="storage">Mutable storage. Each crawler should have access to it</param>
     /// <param name="threadState">Provides access to the states of other threads</param>
-    /// <param name="threadState">Provides access to the states of other threads</param>
+    /// <param name="threadId">Identifier of the crawler</param>
+    /// <param name="actions">Module actions that should be executed for each URL</param>
     /// <remarks>
-    /// TODO
+    /// Manages thread state
+    /// Works with the global unique queue
+    /// Calls <see cref="HtmlScraper"/> and updates the current CrawledSite object in case of any errors 
+    /// Contains the main logic for adding new urls to the unique queue. It parses all links on a given website.
+    /// Processes modules and adds the data to the global storage
     /// </remarks>
     private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<DatasetItem> storage, ThreadState threadState, int threadId, Action<string, DatasetItem>[] actions)
     {
@@ -154,10 +160,17 @@ public class Crawler
         }
     }
 
+    /// <summary>
+    /// Creates an array of actions to be executed
+    /// </summary>
     private Action<string, DatasetItem>[] SetupModules()
     {
         if (_modules != null)
         {
+            /**
+             * This might seem like a redundant step but Crawl method should contain as little logic as possible and the idea of actions
+             * was introduced because modules are not the only logic that is executed on the Html content.
+            */
             Action<string, DatasetItem>[] actions = new Action<string, DatasetItem>[_modules.Length];
             for (int i = 0; i < _modules.Length; i++)
             {
@@ -171,6 +184,15 @@ public class Crawler
         return Array.Empty<Action<string, DatasetItem>>();
 
     }
+
+    /// <summary>
+    /// Starts the crawling process. Executes the given number of parallel tasks
+    /// </summary>
+    /// <remarks>
+    /// Initializes <see cref="UniqueQueue"/> and <see cref="ThreadState"/>
+    /// Cannot call getFinalList() while the main crawling process is running
+    /// </remarks>
+
     public async Task StartAsync()
     {
         lock (_status)
