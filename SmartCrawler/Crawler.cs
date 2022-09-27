@@ -3,7 +3,10 @@ using SmartCrawler.Modules;
 
 namespace SmartCrawler;
 
-
+/**
+ * Main logic of the SmartCrawler
+ * Consult docs for further details of how this class works
+ */
 public class Crawler
 {
     private readonly CrawlerOptions _options;
@@ -26,6 +29,15 @@ public class Crawler
         _modules = modules;
     }
     
+    /// <summary>
+    /// Creates a new Crawler instance. Keeps the original options object linked to the new instance and creates a new module list that contain the <see cref="newModule"/>
+    /// </summary>
+    /// <param name="newModule">Module that will be added to the new Crawler instance</param>
+    /// <remarks>
+    /// This method should be only used in the module extension methods.
+    /// Be aware of its immutable and mutable properties.
+    /// The inheritance of the options object is done on purpose, so all crawlers that were rebuilt can be changed easily.
+    /// </remarks>
     public Crawler Rebuild(IBaseModule newModule)
     {
         var newModules = _modules != null ? _modules.Concat(new[] { newModule }).ToArray() : new[] { newModule };
