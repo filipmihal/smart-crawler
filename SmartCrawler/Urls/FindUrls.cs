@@ -1,6 +1,6 @@
 using System.Net;
 
-public  class FinUrls {
+public  class FindUrls {
 
     public static string RequestGoogleApi(string key, string searchQuery)
     {
