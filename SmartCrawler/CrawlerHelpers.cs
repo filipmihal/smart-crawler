@@ -46,7 +46,7 @@ public static class CrawlerHelpers
     /// <param name="inputString">raw html content</param>
     /// <param name="parentUrl">Url from which the html content originates</param>
     /// <remarks>
-    /// This function also processes relative links and appends the correct uri to the paths
+    /// This method also processes relative links and appends the correct uri to the paths
     /// </remarks>
     public static List<string> ParseLinks(string inputString, string parentUrl)
     {
