@@ -1,16 +1,24 @@
-string googleQuery = "YOUR_GOOGLE_QUERY";
-string key = "YOUR_API_KEY";
-string url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={googleQuery}&key={key}";
+using System.Net;
 
-WebRequest request = WebRequest.Create(url);
+public  class FinUrls {
 
-WebResponse response = request.GetResponse();
+    public static string RequestGoogleApi(string key, string searchQuery)
+    {
+        string url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={searchQuery}&key={key}";
 
-Stream data = response.GetResponseStream();
+        WebRequest request = WebRequest.Create(url);
 
-StreamReader reader = new StreamReader(data);
+        WebResponse response = request.GetResponse();
 
-// json-formatted string from maps api
-string responseFromServer = reader.ReadToEnd();
+        Stream data = response.GetResponseStream();
 
-response.Close();
+        StreamReader reader = new StreamReader(data);
+
+        // json-formatted string from maps api
+        string responseFromServer = reader.ReadToEnd();
+
+        response.Close();
+
+        return responseFromServer;
+    }
+}
