@@ -24,7 +24,7 @@ public class Json<T> : ExportBase<T>
                     {
                         string exportedJson = JsonSerializer.Serialize<T>(items[idx], options);
                         string digits = "D" + items.Count;
-                        File.WriteAllText($@"exported_url_{idx.ToString(digits)}.{GetExtension()}", exportedJson);
+                        File.WriteAllText($@"{ExportOptions.Filename}_{idx.ToString(digits)}.{GetExtension()}", exportedJson);
                     }
                     break;
                 }

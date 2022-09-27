@@ -21,6 +21,7 @@ public struct SupportedType
 public class Sql<T> : ExportBase<T>
 {
     private static string tableName = "CRAWLED_DATA";
+
     private static SupportedType[] SupportedTypes = new[]
     {
         new SupportedType(typeof(bool), "BOOL"),
@@ -33,6 +34,14 @@ public class Sql<T> : ExportBase<T>
         new SupportedType(typeof(string[]), "TEXT"),
     };
 
+
+    /// <summary>
+    ///  Converts property value to an sql format
+    /// </summary>
+    /// <remarks>
+    /// Arrays are converted to a string and the values are separated by a comma
+    /// ["hello", "coffee"] ==> TEXT 'hello, coffee'
+    /// </remarks>
     private static string ConvertValue(SupportedType type, object propValue)
     {
         if (type.Type == typeof(string[]))
@@ -66,6 +75,10 @@ public class Sql<T> : ExportBase<T>
         return "sql";
     }
 
+    /// <summary>
+    /// todo
+    /// </summary>
+    /// <param name="type">todo</param>
     private static List<string> CrawlTypeRecursively(Type type, object sample, string prefix, SqlCrawlType crawlType)
     {
         List<string> sql = new List<string>();

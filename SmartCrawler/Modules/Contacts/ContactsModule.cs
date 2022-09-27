@@ -13,6 +13,8 @@ public class ContactsModule: IBaseModuleSetup<ContactsDataset>
 
     public string[] MatchEmails(string text)
     {
+        // Matches emails according to official standard
+        // Emails that are present in Javascript will be matched as well
         Regex emailRegex = new Regex("([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})");
         var matches = emailRegex.Matches(text);
         return matches.Select(a => a.Value).ToArray().Distinct().ToArray();
@@ -20,6 +22,8 @@ public class ContactsModule: IBaseModuleSetup<ContactsDataset>
 
     public string[] MatchPhoneNumbers(string text)
     {
+        // Matches international phone numbers with different prefixes
+        // There is some margin of error present when it comes to matching phone numbers that do not contain dashes, plus or brackets
         Regex pnRegex = new Regex("((\\+\\d{1,3}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{3,4})|(\\+\\d{10,13})");
         var matches = pnRegex.Matches(text);
         return matches.Select(a => a.Value).ToArray().Distinct().ToArray();
