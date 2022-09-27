@@ -1,0 +1,14 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2d843a72_002D36e2_002D4cd6_002D93fd_002D0743458ec740/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="BuildInsertTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;NUnit3x::46267F67-CE92-4977-9227-456A7DCEC8CD::net6.0::Tests.Exports.SqlTest.BuildInsertTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::46267F67-CE92-4977-9227-456A7DCEC8CD::net6.0::Tests.Exports.SqlTest.BuildRowsTest&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=35dab148_002D00f9_002D493b_002D8b13_002Dc8945e8d1064/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestEmailRegex" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;NUnit3x::46267F67-CE92-4977-9227-456A7DCEC8CD::net6.0::Tests.Modules.CryptoWalletsTests.TestEmailRegex&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::46267F67-CE92-4977-9227-456A7DCEC8CD::net6.0::Tests.Exports.SqlTest.BuildTableTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::46267F67-CE92-4977-9227-456A7DCEC8CD::net6.0::Tests.Exports.SqlTest&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
