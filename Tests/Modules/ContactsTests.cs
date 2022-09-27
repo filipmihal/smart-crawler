@@ -6,6 +6,8 @@ public class ContactsTests
 {
     ContactsModule _module = new ContactsModule(scrapeSocial: true);
 
+    // Tests are mainly focused on th correctness of regex expressions
+    // They test different edge cases
     [SetUp]
     public void Setup()
     {

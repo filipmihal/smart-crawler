@@ -76,9 +76,16 @@ public class Sql<T> : ExportBase<T>
     }
 
     /// <summary>
-    /// todo
+    /// Recursive function that returns non-null properties and values of a given type and a corresponding object
     /// </summary>
-    /// <param name="type">todo</param>
+    /// <param name="type">type whose properties are going to be exported</param>
+    /// <param name="sample">object whose type should be the type parameter</param>
+    /// <param name="prefix">sequence of prior properties in order to keep the depth hierarchy and keep every DB column name unique</param>
+    /// <param name="type">Crawling method. Based on this the method either returns a value, property name or both</param>
+    /// <remarks>
+    /// Crawler skips properties whose values are null. Hence it is important to set values correctly for the modules that are being used
+    /// Module dataset must be of reference type. My design does not support structs
+    /// </remarks>
     private static List<string> CrawlTypeRecursively(Type type, object sample, string prefix, SqlCrawlType crawlType)
     {
         List<string> sql = new List<string>();

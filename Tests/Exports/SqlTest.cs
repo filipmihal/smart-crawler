@@ -36,6 +36,11 @@ public class SqlTest
     {
     }
 
+
+    /**
+    * These tests mostly focus on the correctness of the recursive type crawler
+    * and then check the syntax of the sql code
+    */
     [Test]
     public void BuildTableTest()
     {
