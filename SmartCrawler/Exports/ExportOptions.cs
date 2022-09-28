@@ -8,6 +8,7 @@ public enum UrlExportSeparator
     // todo
 }
 
+
 public struct ExportOptions
 {
     public ExportOptions()
@@ -31,3 +32,5 @@ public struct ExportOptions
     /// </remarks>
     public string Filename { get; init; } = "exported_data";
 }
+
+public class UrlExportSeparatorNotSupportedException : Exception{};

@@ -13,6 +13,8 @@ public static class ExportFactory<T>
                 return new Json<T>(exportOptions);
             case ExportType.Sql:
                 return new Sql<T>(exportOptions);
+            case ExportType.Csv:
+                return new Csv<T>(exportOptions);
             default:
                 throw new ExportTypeNotFoundException();
         }
