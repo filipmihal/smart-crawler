@@ -28,4 +28,20 @@ public class StringParserTest
         Assert.That(testParser2.ReadAll(reg), Is.EqualTo("asdf"));
         Assert.That(testParser3.ReadAll(reg), Is.EqualTo(""));
     }
+
+    [Test]
+    public void TestSkipAll()
+    {
+        string testString1 = "      w";
+        StringParser testParser1 = new StringParser(testString1);
+        testParser1.SkipAll(new Regex(@"[\s]"));
+        Assert.That(testParser1.Peek(), Is.EqualTo('w'));
+        
+        string testString2 = "      ";
+        StringParser testParser2 = new StringParser(testString2);
+        testParser2.SkipAll(new Regex(@"[\s]"));
+        Assert.That(testParser2.IsEndOfString, Is.EqualTo(true));
+
+
+    }
 }
