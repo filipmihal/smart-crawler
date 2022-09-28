@@ -1,9 +1,9 @@
 namespace SmartCrawler.Parser;
 
-public class HtmlElement
+public class HtmlElement : GeneralHtmlElement
 {
-    /// <summary>
-    /// Html tag name in lower case
-    /// </summary>
-    public string? Name { get; }
+    public HtmlAttributes Attributes = new HtmlAttributes();
+    public HtmlElement(string name) : base(name)
+    {
+    }
 }
