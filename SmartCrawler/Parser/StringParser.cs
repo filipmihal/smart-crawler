@@ -61,6 +61,24 @@ public class StringParser
     }
 
     /// <summary>
+    /// Reads all characters until one of the characters matches the condition
+    /// <param name="condition">Constraint according to which characters are selected</param>
+    /// </summary>
+    public string ReadUntil(Regex condition)
+    {
+        string result = "";
+        while (!condition.IsMatch(Peek().ToString()))
+        {
+            result += Peek();
+            if (!Next())
+            {
+                return result;
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Skips all characters that satisfy the regex expression until it reaches one that does not
     /// <param name="skip">Skip rule</param>
     /// </summary>

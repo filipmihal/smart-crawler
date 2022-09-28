@@ -8,7 +8,35 @@ public class Document
 
     public static HtmlAttributes ParseAttributes(StringParser parser)
     {
-        throw new Exception();
+        HtmlAttributes attributes = new HtmlAttributes();
+        Regex attributeNameRegex = new Regex(@"[0-9]|[a-z]|[A-Z]|_|-");
+        while (parser.Peek() != '>' && parser.Peek() != '/' && !parser.IsEndOfString)
+        {
+            parser.SkipAll(new Regex(@"[\s]"));
+            string attributeName = parser.ReadAll(attributeNameRegex);
+            if (attributeName.Length == 0)
+            {
+                parser.Next();
+                continue;
+            }
+            if (parser.Peek() == ' ' || parser.Peek() == '>' || parser.Peek() == '/')
+            {
+                attributes.Add(attributeName, "");
+                continue;
+            }
+            if (parser.Peek() == '=')
+            {
+                parser.Next();
+                if (parser.Peek() == '"' || parser.Peek() == '\'')
+                {
+                    parser.Next();
+                    string attributeValue = parser.ReadUntil(new Regex("[\"]|[']"));
+                    attributes.Add(attributeName, attributeValue);
+                }
+            }
+        }
+
+        return attributes;
     }
     public static HtmlElement[] ParseHtml(string text)
     {
@@ -38,7 +66,7 @@ public class Document
                     {
                         continue;
                     }
-                    
+
                 }
             }
         }
