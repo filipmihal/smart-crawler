@@ -7,7 +7,7 @@ namespace SmartCrawler.Exports
     }
     public class Csv<T> : ExportBase<T>
     {
-        private static Type[] _supported = new[] { typeof(bool), typeof(string), typeof(int), typeof(decimal), typeof(float), typeof(double), typeof(DateTime), typeof(string[]) };
+        private static Type[] _supported = new[] { typeof(bool), typeof(string), typeof(int), typeof(decimal), typeof(float), typeof(double), typeof(DateTime), typeof(string[]), typeof(int[]) };
 
 
         public Csv(ExportOptions exportOptions) : base(exportOptions)
@@ -17,6 +17,16 @@ namespace SmartCrawler.Exports
         public static bool IsTypeSupported(Type type)
         {
             return _supported.Any(supportedType => supportedType == type);
+        }
+
+        public static string ConvertEnumerableToValue(Array? items)
+        {
+            if (items.Length == 0)
+            {
+                return "";
+            }
+            string[]? newVal = (string[])items!;
+            return string.Join(';', newVal);
         }
 
         private static List<string> CrawlTypeRecursively(Type type, object sample, string prefix, CSVCrawlerType crawlType)
@@ -31,12 +41,16 @@ namespace SmartCrawler.Exports
                     switch (crawlType)
                     {
                         case CSVCrawlerType.Values:
-                            string? value = propertyValue.ToString();
-                            if (value is null)
+                            if (propertyValue is null)
                             {
                                 throw new CanConvertToStringException();
                             }
-                            csvArray.Add($"\"{value}\"");
+                            if (property.PropertyType == typeof(string[]) || property.PropertyType == typeof(int[]))
+                            {
+                                csvArray.Add($"\"{ConvertEnumerableToValue(propertyValue as Array)}\"");
+                                break;
+                            }
+                            csvArray.Add($"\"{propertyValue}\"");
                             break;
                         case CSVCrawlerType.Header:
                             csvArray.Add($"\"{prefix}{property.Name}\"");
@@ -86,11 +100,11 @@ namespace SmartCrawler.Exports
             {
                 throw new NoDataForCSVExportException();
             }
+            string header = BuildHeader(items[0]);
             switch (ExportOptions.Separator)
             {
                 case UrlExportSeparator.SingleFile:
                     {
-                        string header = BuildHeader(items[0]);
                         string values = BuildValues(items);
                         string finalCsv = header + "\n" + values;
                         File.WriteAllText($@"{ExportOptions.Filename}.{GetExtension()}", finalCsv);
@@ -98,12 +112,12 @@ namespace SmartCrawler.Exports
                     }
                 case UrlExportSeparator.Url:
                     {
-                        string header = BuildHeader(items[0]);
                         for (int idx = 0; idx < items.Count; idx++)
                         {
-                            string digits = "D" + items.Count;
+                            string digits = "D" + Math.Ceiling(Math.Log10(items.Count + 1));
                             string row = BuildValue(items[idx]);
-                            File.WriteAllText($@"{ExportOptions.Filename}_{idx.ToString(digits)}.{GetExtension()}", row);
+                            string finalCsv = header + "\n" + row;
+                            File.WriteAllText($@"{ExportOptions.Filename}_{idx.ToString(digits)}.{GetExtension()}", finalCsv);
                         }
                         break;
                     }

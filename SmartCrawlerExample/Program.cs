@@ -1,6 +1,7 @@
 ﻿using SmartCrawler;
 using SmartCrawler.Exports;
 using SmartCrawler.Modules.Contacts;
+using SmartCrawler.Modules.CryptoWallets;
 using SmartCrawler.Urls;
 using SmartCrawlerExample;
 
@@ -33,9 +34,23 @@ foreach (var emailsOnUrl in emails)
 }
 
 // export to JSON and SQL
-ExportOptions options = new ExportOptions(){Filename = "emails"};
+ExportOptions options = new ExportOptions() { Filename = "emails" };
 crawler.ExportDataset(options, ExportType.Sql);
 crawler.ExportDataset(options, ExportType.Json);
-var a = crawler.GetFinalList();
-Console.WriteLine("Ahoj");
+ExportOptions optionsCSV = new ExportOptions() { Filename = "emails", Separator = UrlExportSeparator.Url };
+
+crawler.ExportDataset(optionsCSV, ExportType.Csv);
+
+
+// CSV EXPORT EXAMPLE
+CrawlingDepthOptions depth2 = new CrawlingDepthOptions(crawlingDepth: 2, visitCrossDomain: true);
+CrawlerOptions option2 = new CrawlerOptions(parallelCrawlers: 7, maxRetries: 1, depth);
+
+//2. Setup the SmartCrawler
+SmartCrawler.Crawler crawler2 = new SmartCrawler.Crawler(option, UrlSamples.CateringCompaniesInLondon, new[] { new CryptoWalletsModule() });
+await crawler2.StartAsync();
+
+ExportOptions options2 = new ExportOptions() { Filename = "crypto", Separator = UrlExportSeparator.Url };
+crawler2.ExportDataset(options2, ExportType.Csv);
+
 
