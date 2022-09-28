@@ -15,6 +15,9 @@ public class StringParser
         IsEndOfString = _text.Length == 0;
     }
 
+    /// <summary>
+    /// Equivalent to Stream Next
+    /// </summary>
     public bool Next()
     {
         if (_index >= _text.Length - 1)
@@ -26,6 +29,9 @@ public class StringParser
         return true;
     }
 
+    /// <summary>
+    /// Returns the current character or throws an exception
+    /// </summary>
     public char Peek()
     {
         if (_index >= _text.Length)
@@ -35,6 +41,11 @@ public class StringParser
         return _text[_index];
     }
 
+    /// <summary>
+    /// Reads all characters that satisfy the regex expression until it reaches one that does not
+    /// Then returns those characters as a string
+    /// <param name="condition">Constraint according to which characters are selected</param>
+    /// </summary>
     public string ReadAll(Regex condition)
     {
         string result = "";
@@ -49,6 +60,10 @@ public class StringParser
         return result;
     }
 
+    /// <summary>
+    /// Skips all characters that satisfy the regex expression until it reaches one that does not
+    /// <param name="skip">Skip rule</param>
+    /// </summary>
     public void SkipAll(Regex skip)
     {
         while (skip.IsMatch(Peek().ToString()))
