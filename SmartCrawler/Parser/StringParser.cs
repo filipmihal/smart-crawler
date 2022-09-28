@@ -12,12 +12,14 @@ public class StringParser
     public StringParser(string text)
     {
         _text = text;
+        IsEndOfString = _text.Length == 0;
     }
 
     public bool Next()
     {
         if (_index >= _text.Length - 1)
         {
+            IsEndOfString = true;
             return false;
         }
         _index += 1;
@@ -45,6 +47,17 @@ public class StringParser
             }
         }
         return result;
+    }
+
+    public void SkipAll(Regex skip)
+    {
+        while (skip.IsMatch(Peek().ToString()))
+        {
+            if (!Next())
+            {
+                return;
+            }
+        }
     }
 }
 
