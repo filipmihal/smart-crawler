@@ -39,9 +39,9 @@ public class CsvTest
     [Test]
     public void CSVBuildValuesTest()
     {
-        string expectedHeader = $"\"30\",\"stringprop\",\"item\"";
-        SubClass cls = new SubClass() { Item = "item" };
-        TestCsvItem item = new TestCsvItem() { DecimalProp = 30, ClassProp = cls, StringProp = "stringprop" };
+        string expectedHeader = $"\"10\",\"stringprop\",\"itemTest\"";
+        SubClass cls = new SubClass() { Item = "itemTest" };
+        TestCsvItem item = new TestCsvItem() { DecimalProp = 10, ClassProp = cls, StringProp = "stringprop" };
         Csv<TestCsvItem> csvExport = new Csv<TestCsvItem>(new ExportOptions());
         string result = csvExport.BuildValue(item);
         Assert.That(result, Is.EqualTo(expectedHeader));
