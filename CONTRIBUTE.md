@@ -91,7 +91,11 @@ SQL export is built from the ground up. It uses reflection to find all dataset p
 
 ## Tests
 
-Around 70% of the code is covered by unit tests. All methods that contain nontrivial logic must be tested thoroughly. Tests are located in the [Tests](./Tests/) project.
+Around 80% of the code is covered by unit tests. All methods that contain nontrivial logic must be tested thoroughly. Tests are located in the [Tests](./Tests/) project.
+
+## Custom Html Parser
+
+can be used by calling `Document.ParseHtml(html);`
 
 ## Used technologies from the Advanced C# course
 
@@ -113,3 +117,5 @@ Around 70% of the code is covered by unit tests. All methods that contain nontri
     }
   ```
   Lambda functions are then executed in `SetupModules` method in [Crawler.cs](./SmartCrawler/Crawler.cs)
+  - Reflection
+    - Used in SQL and CSV exports

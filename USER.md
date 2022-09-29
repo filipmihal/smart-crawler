@@ -132,3 +132,7 @@ In order to add your own modules, you need to create a dataset class and a modul
 
     }
     ```
+
+## Custom Html Parser
+
+can be used by calling `Document.ParseHtml(html);`
