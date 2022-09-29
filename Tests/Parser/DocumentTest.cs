@@ -128,4 +128,34 @@ public class DocumentTest
         Assert.That(div.Children.Count, Is.EqualTo(1));
 
     }
+
+    [Test]
+    public void TestElementRelationships()
+    {
+        string validHtml = @"
+        <meta />
+        <div>
+        <h1>Hello</h1>
+        <h2>Ahoj</h2>
+        <h3>Ciao</h3>
+        </div>
+         ";
+        Element[] elements = Document.ParseHtml(validHtml);
+        HtmlElement div = (HtmlElement)elements[1];
+        Assert.That(div.Children[0].Name, Is.EqualTo("h1"));
+        Assert.That(div.Children[1].Name, Is.EqualTo("h2"));
+        Assert.That(div.Children[2].Name, Is.EqualTo("h3"));
+
+        Assert.That(div.Children[0].NextElement, Is.EqualTo(div.Children[1]));
+        Assert.That(div.Children[1].NextElement, Is.EqualTo(div.Children[2]));
+        Assert.That(div.Children[2].NextElement, Is.EqualTo(null));
+
+        Assert.That(div.Children[0].PreviousElement, Is.EqualTo(null));
+        Assert.That(div.Children[1].PreviousElement, Is.EqualTo(div.Children[0]));
+        Assert.That(div.Children[2].PreviousElement, Is.EqualTo(div.Children[1]));
+
+        Assert.That(div.Children[0].ParentElement, Is.EqualTo(div));
+        Assert.That(((HtmlElement)div.Children[1]).Children[0].ParentElement, Is.EqualTo(div.Children[1]));
+
+    }
 }

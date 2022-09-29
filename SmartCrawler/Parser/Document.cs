@@ -58,13 +58,17 @@ public class Document
         List<Element> rootElements = new List<Element>();
         StringParser parser = new StringParser(text);
         HtmlElement? parentElem = null;
-        HtmlElement? previousElem = null;
+        Element? previousElem = null;
 
         Action<Element> ConnectElements =
        (Element elem) =>
        {
            if (parentElem is not null)
            {
+               if (parentElem.Children.Count > 0)
+               {
+                   parentElem.Children[parentElem.Children.Count - 1].NextElement = elem;
+               }
                parentElem.AddChild(elem);
            }
            else
@@ -111,6 +115,14 @@ public class Document
                     parser.SkipUntil('>');
                     parser.Next();
                     parentElem = parentElem.ParentElement;
+                    if (parentElem is null || parentElem.Children.Count == 0)
+                    {
+                        previousElem = null;
+                    }
+                    else
+                    {
+                        previousElem = parentElem.Children[^1];
+                    }
                 }
                 else
                 {
@@ -146,7 +158,7 @@ public class Document
             else if (parser.Peek() != ' ')
             {
                 string content = parser.ReadUntil(new Regex("<"));
-                TextElement textElem = new TextElement(content, parentElem, previousElem);
+                TextElement textElem = new TextElement(content, previousElem, parentElem);
                 ConnectElements(textElem);
 
             }
