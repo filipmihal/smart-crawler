@@ -1,11 +1,7 @@
 namespace SmartCrawler.Parser;
 
-public class HtmlElement
+public class HtmlElement : Element
 {
-    /// <summary>
-    /// Html tag name in lower case
-    /// </summary>
-    public string Name { get; }
 
     /// <summary>
     /// List of children
@@ -14,38 +10,16 @@ public class HtmlElement
     /// <remarks>
     /// HtmlElement type is used by default
     /// </remarks/>
-    public List<HtmlElement> Children { get; private set; }
-
-    /// <summary>
-    /// The previous node that comes before the current one in the DOM hierarchy
-    /// </summary>
-    /// <remarks>
-    /// HtmlElement type is used by default
-    /// </remarks/>
-    public HtmlElement? PreviousElement { get; private set; }
-
-    /// <summary>
-    /// The next node that comes after the current one in the DOM hierarchy
-    /// </summary>
-    /// <remarks>
-    /// HtmlElement type is used by default
-    /// </remarks/>
-    public HtmlElement? NextElement { get; set; }
-
-    public HtmlElement? ParentElement { get; }
+    public List<Element> Children { get; private set; }
 
 
     public HtmlAttributes Attributes { get; }
 
-    public HtmlElement(string name, HtmlAttributes attributes, HtmlElement? previousElement, HtmlElement? parentElement)
+    public HtmlElement(string name, HtmlAttributes attributes, Element? previousElement, HtmlElement? parentElement) : base(name, previousElement, parentElement)
     {
 
-        // name must be in lower case
-        Name = name.ToLower();
         Attributes = attributes;
-        PreviousElement = previousElement;
-        ParentElement = parentElement;
-        Children = new List<HtmlElement>();
+        Children = new List<Element>();
     }
 
     /// <summary>
@@ -54,7 +28,7 @@ public class HtmlElement
     /// <remarks>
     /// Add children in order they occur in DOM
     /// </remarks/>
-    public void AddChild(HtmlElement element)
+    public void AddChild(Element element)
     {
         Children.Add(element);
     }

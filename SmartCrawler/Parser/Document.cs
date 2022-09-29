@@ -10,7 +10,7 @@ public class Document
     {
         HtmlAttributes attributes = new HtmlAttributes();
         Regex attributeNameRegex = new Regex(@"[0-9]|[a-z]|[A-Z]|_|-");
-        while ( !parser.IsEndOfString && parser.Peek() != '>' && parser.Peek() != '/')
+        while (!parser.IsEndOfString && parser.Peek() != '>' && parser.Peek() != '/')
         {
             parser.SkipAll(new Regex(@"[\s]"));
             string attributeName = parser.ReadAll(attributeNameRegex);
@@ -19,7 +19,7 @@ public class Document
                 if (parser.Peek() != '>' && parser.Peek() != '/')
                 {
                     parser.Next();
-                }  
+                }
                 continue;
             }
             if (parser.Peek() == ' ' || parser.Peek() == '>' || parser.Peek() == '/')
@@ -49,13 +49,13 @@ public class Document
 
         return attributes;
     }
-    public static HtmlElement[] ParseHtml(string text)
+    public static Element[] ParseHtml(string text)
     {
         if (text.Length == 0)
         {
-            return Array.Empty<HtmlElement>();
+            return Array.Empty<Element>();
         }
-        List<HtmlElement> rootElements = new List<HtmlElement>();
+        List<Element> rootElements = new List<Element>();
         StringParser parser = new StringParser(text);
         HtmlElement? parentElem = null;
         HtmlElement? previousElem = null;
@@ -104,10 +104,22 @@ public class Document
                     }
                 }
             }
-            else
+            else if (parser.Peek() != ' ')
             {
-                parser.Next();
-                // TODO: process content
+                string content = parser.ReadUntil(new Regex("<"));
+                TextElement textElem = new TextElement(content, parentElem, previousElem);
+                if (parentElem is not null)
+                {
+                    parentElem.AddChild(textElem);
+                }
+                else
+                {
+                    rootElements.Add(textElem);
+                }
+                if (previousElem is not null)
+                {
+                    previousElem.NextElement = textElem;
+                }
             }
         }
         return rootElements.ToArray();

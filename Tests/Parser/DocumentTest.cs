@@ -35,26 +35,52 @@ public class DocumentTest
     public void TestRootSingleTags()
     {
         string singleTags = "<br/> <img src='game.jpg' />    ";
-        HtmlElement[] elements = Document.ParseHtml(singleTags);
-        Assert.Multiple(() =>
+        Element[] elements = Document.ParseHtml(singleTags);
+        if (elements[0] is not HtmlElement)
         {
-            Assert.That(elements.Length, Is.EqualTo(2));
-            Assert.That(elements[0].Name, Is.EqualTo("br"));
-            Assert.That(elements[1].Name, Is.EqualTo("img"));
-        });
+            throw new Exception();
+        }
+        if (elements[1] is not HtmlElement)
+        {
+            throw new Exception();
+        }
+        Assert.That(elements.Length, Is.EqualTo(2));
+        Assert.That(elements[0].Name, Is.EqualTo("br"));
+        Assert.That(elements[1].Name, Is.EqualTo("img"));
+
     }
-    
-    
+
+
     [Test]
     public void TestRootSingleTagsInvalid()
     {
         string singleTags = "<br !# # # # /> <img src='game.jpg' $$ />  <video ^^  ";
-        HtmlElement[] elements = Document.ParseHtml(singleTags);
-        Assert.Multiple(() =>
+        Element[] elements = Document.ParseHtml(singleTags);
+
+        Assert.That(elements.Length, Is.EqualTo(2));
+        if (elements[0] is not HtmlElement)
         {
-            Assert.That(elements.Length, Is.EqualTo(2));
-            Assert.That(elements[0].Name, Is.EqualTo("br"));
-            Assert.That(elements[1].Name, Is.EqualTo("img"));
-        });
+            throw new Exception();
+        }
+        if (elements[1] is not HtmlElement)
+        {
+            throw new Exception();
+        }
+        Assert.That(elements[0].Name, Is.EqualTo("br"));
+        Assert.That(elements[1].Name, Is.EqualTo("img"));
+    }
+
+    [Test]
+    public void TestTextElement()
+    {
+        string singleTags = " <img src='game.jpg' $$ />  hello world <video/>  ";
+        Element[] elements = Document.ParseHtml(singleTags);
+
+        Assert.That(elements.Length, Is.EqualTo(3));
+        if (elements[1] is not TextElement)
+        {
+            throw new Exception();
+        }
+        Assert.That(((TextElement)elements[1]).Content, Is.EqualTo("hello world "));
     }
 }
