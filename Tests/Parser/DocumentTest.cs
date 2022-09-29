@@ -106,4 +106,26 @@ public class DocumentTest
 
         Assert.That(((HtmlElement)elements[0]).Children.Count, Is.EqualTo(3));
     }
+
+    [Test]
+    public void TestMismatchedNestedHtml()
+    {
+        string validHtml = @"
+        <html>
+            hello friends!
+            <img/>
+            <div>
+                <a>
+                hello
+            </div>
+        </html>
+         ";
+        Element[] elements = Document.ParseHtml(validHtml);
+        Assert.That(((HtmlElement)elements[0]).Children.Count, Is.EqualTo(3));
+        Assert.That(((HtmlElement)elements[0]).Children[2].Name, Is.EqualTo("div"));
+
+        HtmlElement div = (HtmlElement)((HtmlElement)elements[0]).Children[2];
+        Assert.That(div.Children.Count, Is.EqualTo(1));
+
+    }
 }

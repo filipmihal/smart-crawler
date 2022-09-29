@@ -97,9 +97,16 @@ public class Document
                     }
                     if (parentElem.Name != tagName)
                     {
-                        // Html mismatch
-                        // TODO: go through parents and close all of them until you get to the matching tag.
-                        // if you can't get there, then close the current one
+                        HtmlElement currentParent = parentElem;
+                        while (parentElem.Name != tagName)
+                        {
+                            parentElem = parentElem.ParentElement;
+                            if (parentElem is null)
+                            {
+                                parentElem = currentParent;
+                                break;
+                            }
+                        }
                     }
                     parser.SkipUntil('>');
                     parser.Next();
