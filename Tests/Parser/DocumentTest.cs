@@ -112,11 +112,11 @@ public class DocumentTest
     {
         string validHtml = @"
         <html>
-            hello friends!
+            text
             <img/>
             <div>
                 <a>
-                hello
+                text2
             </div>
         </html>
          ";
