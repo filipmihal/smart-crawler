@@ -53,4 +53,8 @@ await crawler2.StartAsync();
 ExportOptions options2 = new ExportOptions() { Filename = "crypto", Separator = UrlExportSeparator.Url };
 crawler2.ExportDataset(options2, ExportType.Csv);
 
+// You must download the core.xml to run this
+// SmartCrawler.Crawler crawlerLang = new SmartCrawler.Crawler(option, new[] { "https://filipmihal.com/" }).Language();
+// await crawlerLang.StartAsync();
+
 

@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="NTextCat" Version="0.3.65" />
       <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
     </ItemGroup>
 

@@ -1,5 +1,6 @@
 using SmartCrawler.Modules.Contacts;
 using SmartCrawler.Modules.CryptoWallets;
+using SmartCrawler.Modules.LanguageDetection;
 
 namespace SmartCrawler.Modules;
 
@@ -26,6 +27,8 @@ public class DatasetItem
     // Set them as nullable
     public ContactsDataset? Contacts { get; set; }
     public CryptoWalletsDataset? Wallets { get; set; }
+    
+    public LanguageDetectionDataset? LanguageDetection { get; set; }
 
     public DatasetItem(string url)
     {
