@@ -30,13 +30,33 @@ public class HtmlElement
     /// <remarks>
     /// HtmlElement type is used by default
     /// </remarks/>
-    public HtmlElement? NextElement { get; private set; }
+    public HtmlElement? NextElement { get; set; }
 
-    public HtmlAttributes Attributes = new HtmlAttributes();
+    public HtmlElement? ParentElement { get; }
 
-    public HtmlElement(string name)
+
+    public HtmlAttributes Attributes { get; }
+
+    public HtmlElement(string name, HtmlAttributes attributes, HtmlElement? previousElement, HtmlElement? parentElement)
     {
-        Name = name;
+
+        // name must be in lower case
+        Name = name.ToLower();
+        Attributes = attributes;
+        PreviousElement = previousElement;
+        ParentElement = parentElement;
+        Children = new List<HtmlElement>();
+    }
+
+    /// <summary>
+    /// Adds a child to the element
+    /// </summary>
+    /// <remarks>
+    /// Add children in order they occur in DOM
+    /// </remarks/>
+    public void AddChild(HtmlElement element)
+    {
+        Children.Add(element);
     }
 
     public HtmlElement Query(string tag)

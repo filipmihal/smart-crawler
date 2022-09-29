@@ -79,12 +79,49 @@ public class StringParser
     }
 
     /// <summary>
+    /// Skips all characters until one of the characters matches the condition
+    /// <param name="condition">Constraint according to which characters are selected</param>
+    /// </summary>
+    public void SkipUntil(Regex condition)
+    {
+        while (!condition.IsMatch(Peek().ToString()))
+        {
+            if (!Next())
+            {
+                return;
+            }
+        }
+    }
+
+    public void SkipUntil(char constraint)
+    {
+        while (Peek() != constraint)
+        {
+            if (!Next())
+            {
+                return;
+            }
+        }
+    }
+
+    /// <summary>
     /// Skips all characters that satisfy the regex expression until it reaches one that does not
     /// <param name="skip">Skip rule</param>
     /// </summary>
     public void SkipAll(Regex skip)
     {
         while (skip.IsMatch(Peek().ToString()))
+        {
+            if (!Next())
+            {
+                return;
+            }
+        }
+    }
+    
+    public void SkipAll(char skip)
+    {
+        while (Peek() == ' ')
         {
             if (!Next())
             {

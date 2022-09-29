@@ -10,13 +10,16 @@ public class Document
     {
         HtmlAttributes attributes = new HtmlAttributes();
         Regex attributeNameRegex = new Regex(@"[0-9]|[a-z]|[A-Z]|_|-");
-        while (parser.Peek() != '>' && parser.Peek() != '/' && !parser.IsEndOfString)
+        while ( !parser.IsEndOfString && parser.Peek() != '>' && parser.Peek() != '/')
         {
             parser.SkipAll(new Regex(@"[\s]"));
             string attributeName = parser.ReadAll(attributeNameRegex);
             if (attributeName.Length == 0)
             {
-                parser.Next();
+                if (parser.Peek() != '>' && parser.Peek() != '/')
+                {
+                    parser.Next();
+                }  
                 continue;
             }
             if (parser.Peek() == ' ' || parser.Peek() == '>' || parser.Peek() == '/')
@@ -27,11 +30,19 @@ public class Document
             if (parser.Peek() == '=')
             {
                 parser.Next();
-                if (parser.Peek() == '"' || parser.Peek() == '\'')
+                if (parser.Peek() == '"')
                 {
                     parser.Next();
-                    string attributeValue = parser.ReadUntil(new Regex("[\"]|[']"));
+                    string attributeValue = parser.ReadUntil(new Regex("[\"]"));
                     attributes.Add(attributeName, attributeValue);
+                    parser.Next();
+                }
+                else if (parser.Peek() == '\'')
+                {
+                    parser.Next();
+                    string attributeValue = parser.ReadUntil(new Regex("[\']"));
+                    attributes.Add(attributeName, attributeValue);
+                    parser.Next();
                 }
             }
         }
@@ -46,8 +57,12 @@ public class Document
         }
         List<HtmlElement> rootElements = new List<HtmlElement>();
         StringParser parser = new StringParser(text);
+        HtmlElement? parentElem = null;
+        HtmlElement? previousElem = null;
+
         while (!parser.IsEndOfString)
         {
+            parser.SkipAll(' ');
             if (parser.Peek() == '<')
             {
                 parser.Next();
@@ -59,18 +74,42 @@ public class Document
                 else
                 {
                     // opening tag
-                    string tagName = parser.ReadAll(HtmlTagRegex);
-
+                    string tagName = parser.ReadAll(HtmlTagRegex).ToLower();
                     // The tag name contains invalid characters
                     if (tagName.Length == 0)
                     {
                         continue;
                     }
 
+                    HtmlAttributes attributes = ParseAttributes(parser);
+                    parser.SkipAll(' ');
+                    if (parser.Peek() == '/')
+                    {
+                        parser.SkipUntil('>');
+                        HtmlElement newSingleTagElem = new HtmlElement(tagName, attributes, previousElem, parentElem);
+                        if (parentElem is not null)
+                        {
+                            parentElem.AddChild(newSingleTagElem);
+                        }
+                        else
+                        {
+                            rootElements.Add(newSingleTagElem);
+                        }
+                        if (previousElem is not null)
+                        {
+                            previousElem.NextElement = newSingleTagElem;
+                        }
+
+                        parser.Next();
+                    }
                 }
             }
+            else
+            {
+                parser.Next();
+                // TODO: process content
+            }
         }
-        throw new Exception();
-
+        return rootElements.ToArray();
     }
 }

@@ -20,4 +20,41 @@ public class DocumentTest
         Assert.That(attributes.Get("control"), Is.EqualTo(""));
         Assert.That(attributes.Get("hello"), Is.EqualTo("hey"));
     }
+
+    [Test]
+    public void TestInvalidAttributeParsing()
+    {
+        string testText1 = "    @@@ href='http://google.com'";
+        StringParser parser = new StringParser(testText1);
+        HtmlAttributes attributes = Document.ParseAttributes(parser);
+        Assert.That(attributes.GetAvailableAttributes().Count, Is.EqualTo(1));
+        Assert.That(attributes.Get("href"), Is.EqualTo("http://google.com"));
+    }
+
+    [Test]
+    public void TestRootSingleTags()
+    {
+        string singleTags = "<br/> <img src='game.jpg' />    ";
+        HtmlElement[] elements = Document.ParseHtml(singleTags);
+        Assert.Multiple(() =>
+        {
+            Assert.That(elements.Length, Is.EqualTo(2));
+            Assert.That(elements[0].Name, Is.EqualTo("br"));
+            Assert.That(elements[1].Name, Is.EqualTo("img"));
+        });
+    }
+    
+    
+    [Test]
+    public void TestRootSingleTagsInvalid()
+    {
+        string singleTags = "<br !# # # # /> <img src='game.jpg' $$ />  <video ^^  ";
+        HtmlElement[] elements = Document.ParseHtml(singleTags);
+        Assert.Multiple(() =>
+        {
+            Assert.That(elements.Length, Is.EqualTo(2));
+            Assert.That(elements[0].Name, Is.EqualTo("br"));
+            Assert.That(elements[1].Name, Is.EqualTo("img"));
+        });
+    }
 }
