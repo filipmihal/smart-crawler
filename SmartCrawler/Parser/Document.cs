@@ -60,21 +60,56 @@ public class Document
         HtmlElement? parentElem = null;
         HtmlElement? previousElem = null;
 
+        Action<Element> ConnectElements =
+       (Element elem) =>
+       {
+           if (parentElem is not null)
+           {
+               parentElem.AddChild(elem);
+           }
+           else
+           {
+               rootElements.Add(elem);
+           }
+           if (previousElem is not null)
+           {
+               previousElem.NextElement = elem;
+           }
+
+       };
+
+
         while (!parser.IsEndOfString)
         {
-            parser.SkipAll(' ');
+            parser.SkipAll(new Regex(@"[\s]|[\n]"));
             if (parser.Peek() == '<')
             {
                 parser.Next();
                 if (parser.Peek() == '/')
                 {
                     // closing tag
-
+                    string tagName = parser.ReadAll(HtmlTagRegex).ToLower();
+                    if (parentElem is null)
+                    {
+                        parser.SkipUntil('>');
+                        parser.Next();
+                        continue;
+                    }
+                    if (parentElem.Name != tagName)
+                    {
+                        // Html mismatch
+                        // TODO: go through parents and close all of them until you get to the matching tag.
+                        // if you can't get there, then close the current one
+                    }
+                    parser.SkipUntil('>');
+                    parser.Next();
+                    parentElem = parentElem.ParentElement;
                 }
                 else
                 {
                     // opening tag
                     string tagName = parser.ReadAll(HtmlTagRegex).ToLower();
+
                     // The tag name contains invalid characters
                     if (tagName.Length == 0)
                     {
@@ -83,43 +118,30 @@ public class Document
 
                     HtmlAttributes attributes = ParseAttributes(parser);
                     parser.SkipAll(' ');
+                    // Check if tag is a single tag
                     if (parser.Peek() == '/')
                     {
                         parser.SkipUntil('>');
                         HtmlElement newSingleTagElem = new HtmlElement(tagName, attributes, previousElem, parentElem);
-                        if (parentElem is not null)
-                        {
-                            parentElem.AddChild(newSingleTagElem);
-                        }
-                        else
-                        {
-                            rootElements.Add(newSingleTagElem);
-                        }
-                        if (previousElem is not null)
-                        {
-                            previousElem.NextElement = newSingleTagElem;
-                        }
-
-                        parser.Next();
+                        ConnectElements(newSingleTagElem);
+                        previousElem = newSingleTagElem;
                     }
+                    else if (parser.Peek() == '>')
+                    {
+                        HtmlElement newPairedTag = new HtmlElement(tagName, attributes, previousElem, parentElem);
+                        ConnectElements(newPairedTag);
+                        parentElem = newPairedTag;
+                        previousElem = null;
+                    }
+                    parser.Next();
                 }
             }
             else if (parser.Peek() != ' ')
             {
                 string content = parser.ReadUntil(new Regex("<"));
                 TextElement textElem = new TextElement(content, parentElem, previousElem);
-                if (parentElem is not null)
-                {
-                    parentElem.AddChild(textElem);
-                }
-                else
-                {
-                    rootElements.Add(textElem);
-                }
-                if (previousElem is not null)
-                {
-                    previousElem.NextElement = textElem;
-                }
+                ConnectElements(textElem);
+
             }
         }
         return rootElements.ToArray();

@@ -83,4 +83,27 @@ public class DocumentTest
         }
         Assert.That(((TextElement)elements[1]).Content, Is.EqualTo("hello world "));
     }
+
+    [Test]
+    public void TestNestedHtml()
+    {
+        string validHtml = @"</random>
+        <html>
+            hello friends!
+            <img/>
+            <div>
+                hello
+            </div>
+        </html>
+         ";
+        Element[] elements = Document.ParseHtml(validHtml);
+
+        Assert.That(elements.Length, Is.EqualTo(1));
+        if (elements[0] is not HtmlElement)
+        {
+            throw new Exception();
+        }
+
+        Assert.That(((HtmlElement)elements[0]).Children.Count, Is.EqualTo(3));
+    }
 }
