@@ -6,6 +6,13 @@ public class HtmlAttributes
 
     public void Add(string attributeName, string attributeValue)
     {
+        string value;
+        _attributes.TryGetValue(attributeName, out value);
+        if (value is not null)
+        {
+            _attributes[attributeName] = value + " " + attributeValue;
+            return;
+        }
         _attributes.Add(attributeName, attributeValue);
     }
 
