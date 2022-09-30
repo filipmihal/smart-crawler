@@ -66,7 +66,7 @@ public class LanguageDetectionModule : IBaseModuleSetup<LanguageDetectionDataset
 public static class CrawlerExtensionLanguageDetection
 {
 
-    public static Crawler Language(this Crawler crawler)
+    public static Crawler<T> Language<T>(this Crawler<T> crawler) where T : DatasetItem, new()
     {
         return crawler.Rebuild(new LanguageDetectionModule());
     }

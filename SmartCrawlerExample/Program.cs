@@ -1,5 +1,6 @@
 ﻿using SmartCrawler;
 using SmartCrawler.Exports;
+using SmartCrawler.Modules;
 using SmartCrawler.Modules.Contacts;
 using SmartCrawler.Modules.CryptoWallets;
 using SmartCrawler.Urls;
@@ -11,7 +12,7 @@ CrawlingDepthOptions depth = new CrawlingDepthOptions(crawlingDepth: 0, visitCro
 CrawlerOptions option = new CrawlerOptions(parallelCrawlers: 5, maxRetries: 3, depth);
 
 //2. Setup the SmartCrawler
-SmartCrawler.Crawler crawler = new SmartCrawler.Crawler(option, UrlSamples.LawFirmsInSanFrancisco).Contacts(social: true);
+SmartCrawler.Crawler<DatasetItem> crawler = new SmartCrawler.Crawler<DatasetItem>(option, UrlSamples.LawFirmsInSanFrancisco).Contacts(social: true);
 await crawler.StartAsync();
 
 //3. Get the list of crawled data and analyse the results via Linq
@@ -47,7 +48,7 @@ CrawlingDepthOptions depth2 = new CrawlingDepthOptions(crawlingDepth: 2, visitCr
 CrawlerOptions option2 = new CrawlerOptions(parallelCrawlers: 7, maxRetries: 1, depth);
 
 //2. Setup the SmartCrawler
-SmartCrawler.Crawler crawler2 = new SmartCrawler.Crawler(option, UrlSamples.CateringCompaniesInLondon, new[] { new CryptoWalletsModule() });
+SmartCrawler.Crawler<DatasetItem> crawler2 = new SmartCrawler.Crawler<DatasetItem>(option, UrlSamples.CateringCompaniesInLondon, new[] { new CryptoWalletsModule() });
 await crawler2.StartAsync();
 
 ExportOptions options2 = new ExportOptions() { Filename = "crypto", Separator = UrlExportSeparator.Url };

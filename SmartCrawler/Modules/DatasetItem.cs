@@ -9,14 +9,14 @@ namespace SmartCrawler.Modules;
 * Each module must have its property defined here. Otherwise, the module dataset would not be accessible
 *  
 * Each module property must be marked as nullable because of the optional nature of every module
-*/  
+*/
 public class DatasetItem
 {
 
     /// <summary>
     /// URL is a required property that identifies each item in the final list
     /// </summary>
-    public string Url { get; set; }
+    public string? Url { get; set; }
 
     // These two properties are null only if the CrawlingDepthOptions is not defined or its value is set to 0
     public string[]? SubUrls { get; set; }
@@ -27,11 +27,7 @@ public class DatasetItem
     // Set them as nullable
     public ContactsDataset? Contacts { get; set; }
     public CryptoWalletsDataset? Wallets { get; set; }
-    
+
     public LanguageDetectionDataset? LanguageDetection { get; set; }
 
-    public DatasetItem(string url)
-    {
-        Url = url;
-    }
 }

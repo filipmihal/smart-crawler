@@ -39,7 +39,7 @@ public class ContactsTests
         Assert.That(actualEmails.Length, Is.EqualTo(0));
 
     }
-    
+
     [Test]
     public void TestPhoneNumbersRegex()
     {
@@ -57,7 +57,7 @@ public class ContactsTests
         string[] actualPn = _module.MatchPhoneNumbers(textString);
         CollectionAssert.AreEqual(expectedArray, actualPn);
     }
-    
+
     [Test]
     public void TestInvalidPhoneNumbersRegex()
     {
@@ -89,5 +89,21 @@ www.fb.com/test#title
         string[] actualPn = _module.MatchFacebooks(textString);
         CollectionAssert.AreEqual(expectedArray, actualPn);
     }
-    
+
+    [Test]
+    public void TestLinkedInRegex()
+    {
+        string textString = @"
+       <html>
+https://www.linkedin.com/ahoj/ppp-ahoj-ajo
+ssss
+https://www.facebook.com/ahoj/ppp
+https://www.linkedin.com/ahoj/pa-o#aaa
+
+       </html>";
+        string[] expectedArray = new[] { "https://www.linkedin.com/ahoj/ppp-ahoj-ajo", "https://www.linkedin.com/ahoj/pa-o#aaa" };
+        string[] actualPn = _module.MatchLinkedIns(textString);
+        CollectionAssert.AreEqual(expectedArray, actualPn);
+    }
+
 }

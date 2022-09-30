@@ -7,7 +7,7 @@ namespace SmartCrawler;
  * Main logic of the SmartCrawler
  * Consult programming docs for further details of how this class works
  */
-public class Crawler
+public class Crawler<T> where T : DatasetItem, new()
 {
     private readonly CrawlerOptions _options;
 
@@ -15,7 +15,7 @@ public class Crawler
     /// Crawler uses CrawledSites as a unit of inforamtion
     /// </summary>
     private readonly CrawledSite[] _initialUrlList;
-    private readonly AsyncStorage<DatasetItem> _storage = new AsyncStorage<DatasetItem>();
+    private readonly AsyncStorage<T> _storage = new AsyncStorage<T>();
     /// <summary>
     /// _modules are recommended to have immutable nature.
     /// There are many cases when a user wants to have multiple crawlers sharing the same options but containing different modules
@@ -51,11 +51,11 @@ public class Crawler
     /// Be aware of its immutable and mutable properties.
     /// The inheritance of the options object is done on purpose, so all crawlers that were rebuilt from the original one can be changed easily.
     /// </remarks>
-    public Crawler Rebuild(IBaseModule newModule)
+    public Crawler<T> Rebuild(IBaseModule newModule)
     {
         var newModules = _modules != null ? _modules.Concat(new[] { newModule }).ToArray() : new[] { newModule };
 
-        return new Crawler(_options, _initialUrlList, newModules);
+        return new Crawler<T>(_options, _initialUrlList, newModules);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ public class Crawler
     /// Contains the main logic for adding new urls to the unique queue. It parses all links on a given website.
     /// Processes modules and adds the data to the global storage
     /// </remarks>
-    private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<DatasetItem> storage, ThreadState threadState, int threadId, Action<string, DatasetItem>[] actions)
+    private async Task Crawl(AsyncUniqueQueue<CrawledSite> uniqueQueue, AsyncStorage<T> storage, ThreadState threadState, int threadId, Action<string, T>[] actions)
     {
 
         while (true)
@@ -132,7 +132,8 @@ public class Crawler
 
             }
 
-            DatasetItem datasetItem = new DatasetItem(siteToCrawl.Url);
+            T datasetItem = new T();
+            datasetItem.Url = siteToCrawl.Url;
 
             if (siteToCrawl.DepthsLeft > 0 && _options.DepthOptions.HasValue)
             {
@@ -151,7 +152,7 @@ public class Crawler
 
     }
 
-    private void ProcessModules(Action<string, DatasetItem>[] actions, string html, DatasetItem item)
+    private void ProcessModules(Action<string, T>[] actions, string html, T item)
     {
 
         foreach (var action in actions)
@@ -163,7 +164,7 @@ public class Crawler
     /// <summary>
     /// Creates an array of actions to be executed
     /// </summary>
-    private Action<string, DatasetItem>[] SetupModules()
+    private Action<string, T>[] SetupModules()
     {
         if (_modules != null)
         {
@@ -171,7 +172,7 @@ public class Crawler
              * This might seem like a redundant step but Crawl method should contain as little logic as possible and the idea of actions
              * was introduced because modules are not the only logic that is executed on the Html content.
             */
-            Action<string, DatasetItem>[] actions = new Action<string, DatasetItem>[_modules.Length];
+            Action<string, T>[] actions = new Action<string, T>[_modules.Length];
             for (int i = 0; i < _modules.Length; i++)
             {
                 actions[i] = _modules[i].Setup();
@@ -181,7 +182,7 @@ public class Crawler
 
         }
 
-        return Array.Empty<Action<string, DatasetItem>>();
+        return Array.Empty<Action<string, T>>();
 
     }
 
@@ -201,14 +202,14 @@ public class Crawler
         }
         AsyncUniqueQueue<CrawledSite> uniqueQueue = new AsyncUniqueQueue<CrawledSite>(_initialUrlList);
         ThreadState threadState = new ThreadState(_options.ParallelCrawlers);
-        Action<string, DatasetItem>[] actions = SetupModules();
+        Action<string, T>[] actions = SetupModules();
 
         List<Task> tasks = new List<Task>();
 
         for (var i = 0; i < _options.ParallelCrawlers; i++)
         {
             int threadId = i;
-            tasks.Add(Task.Run(async () => await Crawl(uniqueQueue, _storage, threadState, threadId, actions)));
+            tasks.Add(Task.Run(() => Crawl(uniqueQueue, _storage, threadState, threadId, actions)));
         }
 
         await Task.WhenAll(tasks);
@@ -218,7 +219,7 @@ public class Crawler
         }
     }
 
-    public List<DatasetItem> GetFinalList()
+    public List<T> GetFinalList()
     {
         lock (_status)
         {
@@ -232,7 +233,7 @@ public class Crawler
 
     public void ExportDataset(ExportOptions exportOptions, ExportType type)
     {
-        var exportService = ExportFactory<DatasetItem>.GenerateExport(type, exportOptions);
+        var exportService = ExportFactory<T>.GenerateExport(type, exportOptions);
         exportService.Export(GetFinalList());
     }
 }
