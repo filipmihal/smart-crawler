@@ -48,7 +48,7 @@ public class LanguageDetectionModule : IBaseModuleSetup<LanguageDetectionDataset
                 var factory = new RankedLanguageIdentifierFactory();
                 var identifier = factory.Load("Core14.profile.xml"); // can be an absolute or relative path. Beware of 260 chars limitation of the path length in Windows. Linux allows 4096 chars.
                 var languages = identifier.Identify(final);
-                return new LanguageDetectionDataset(languages.FirstOrDefault().Item1.LocalName);
+                return new LanguageDetectionDataset(languages.FirstOrDefault().Item1.Iso639_3);
             }
 
         }

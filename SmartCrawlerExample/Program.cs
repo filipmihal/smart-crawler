@@ -3,6 +3,8 @@ using SmartCrawler.Exports;
 using SmartCrawler.Modules;
 using SmartCrawler.Modules.Contacts;
 using SmartCrawler.Modules.CryptoWallets;
+using SmartCrawler.Modules.LanguageDetection;
+
 using SmartCrawler.Urls;
 using SmartCrawlerExample;
 
@@ -55,7 +57,9 @@ ExportOptions options2 = new ExportOptions() { Filename = "crypto", Separator = 
 crawler2.ExportDataset(options2, ExportType.Csv);
 
 // You must download the core.xml to run this
-// SmartCrawler.Crawler crawlerLang = new SmartCrawler.Crawler(option, new[] { "https://filipmihal.com/" }).Language();
+// SmartCrawler.Crawler<DatasetItem> crawlerLang = new SmartCrawler.Crawler<DatasetItem>(option, new[] { "https://mfts.io/" }).Language();
 // await crawlerLang.StartAsync();
+// var languages = crawlerLang.GetFinalList();
+// Console.WriteLine(languages[0].LanguageDetection.Language);
 
 

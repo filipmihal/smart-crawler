@@ -53,7 +53,7 @@ public class AsyncUniqueQueue<T> where T : IAsyncQueueItem
                 {
                     continue;
                 }
-                
+
                 _set.Add(elem.GetKey());
                 _queue.Enqueue(elem);
 
